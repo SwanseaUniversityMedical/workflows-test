@@ -1,15 +1,18 @@
-name: Whalesay
+name: Whalesay2
 
 on:
   pull_request:
     paths:
-      - 'containers/whalesay/**'
+      - '.github/workflows/Whalesay2.yaml'
+      - 'containers/whalesay2/**'
   merge_group:
+    types: [checks_requested]
   push:
     branches:
       - main
     paths:
-      - 'containers/whalesay/**'
+      - '.github/workflows/Whalesay2.yaml'
+      - 'containers/whalesay2/**'
 
 permissions:
   contents: write
