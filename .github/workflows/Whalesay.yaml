@@ -4,6 +4,7 @@ on:
   pull_request:
     paths:
       - 'containers/whalesay/**'
+  merge_group:
   push:
     branches:
       - main
