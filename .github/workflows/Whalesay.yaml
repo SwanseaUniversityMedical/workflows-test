@@ -3,12 +3,15 @@ name: Whalesay
 on:
   pull_request:
     paths:
+      - '.github/workflows/Whalesay.yaml'
       - 'containers/whalesay/**'
   push:
     branches:
       - main
     paths:
+      - '.github/workflows/Whalesay.yaml'
       - 'containers/whalesay/**'
+
 
 permissions:
   contents: write
