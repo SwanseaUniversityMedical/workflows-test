@@ -57,3 +57,4 @@ jobs:
   #          password: ${{ inputs.registry-token }}
       - name: Run slow CI (emulated by a long sleep)
         run: sleep 60
+
