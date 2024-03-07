@@ -50,3 +50,5 @@ jobs:
       - name: login to container registry
         run: |
           echo 'Hello World'
+      - name: Run slow CI (emulated by a long sleep)
+        run: sleep 60
