@@ -6,7 +6,6 @@ on:
     paths:
       - '.github/workflows/Whalesay.yaml'
       - 'containers/whalesay/**'
-  merge_group:
   push:
     branches:
       - main
