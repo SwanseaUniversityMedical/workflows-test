@@ -30,7 +30,7 @@ jobs:
       job-name: container-whalesay
       registry: ${{ vars.HARBOR_REGISTRY }}
       registry-user: ${{ vars.HARBOR_USER }}
-      registry-repo: ${{ vars.HARBOR_PROJECT }}/${{ vars.HARBOR_REPO }}
+      registry-repo: ${{ vars.HARBOR_PROJECT }}/workflows-test
       release-tag-format: 'whalesay-${version}'
       cosign-public-key: ${{ vars.COSIGN_PUBLIC_KEY }}
       slack-channel: ${{ vars.SLACK_CHANNEL }}
