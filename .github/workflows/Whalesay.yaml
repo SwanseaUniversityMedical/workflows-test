@@ -42,7 +42,7 @@ jobs:
 #      cosign-password: ${{ secrets.COSIGN_PASSWORD }}
 #      registry-token: ${{ secrets.HARBOR_TOKEN }}
 #      slack-token: ${{ secrets.SLACK_TOKEN }}
-  test:
+  whalesay:
     runs-on:
       labels: [ self-hosted, linux, x64 ]
       group: heavy
