@@ -2,10 +2,10 @@ name: Whalesay
 
 on:
   merge_group:
-#  pull_request:
-#    paths:
-#      - '.github/workflows/Whalesay.yaml'
-#      - 'containers/whalesay/**'
+  pull_request:
+    paths:
+      - '.github/workflows/Whalesay.yaml'
+      - 'containers/whalesay/**'
 #  push:
 #    branches:
 #      - main
