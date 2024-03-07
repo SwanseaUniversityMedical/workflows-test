@@ -2,10 +2,10 @@ name: Whalesay2
 
 on:
   merge_group:
-#  pull_request:
-#    paths:
-#      - '.github/workflows/Whalesay2.yaml'
-#      - 'containers/whalesay2/**'
+  pull_request:
+    paths:
+      - '.github/workflows/Whalesay2.yaml'
+      - 'containers/whalesay2/**'
 ##    types: [checks_requested]
 #  push:
 #    branches:
@@ -48,9 +48,6 @@ jobs:
       group: heavy
     steps:
       - name: login to container registry
-        uses: docker/login-action@v3
-#        with:
-#          registry: ${{ inputs.registry }}
-#          username: ${{ inputs.registry-user }}
-#          password: ${{ inputs.registry-token }}
+        run: |
+          echo 'Hello World'
 
