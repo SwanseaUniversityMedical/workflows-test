@@ -15,3 +15,8 @@ maintenance:
 controller-container:
   - base-branch:
       - '.+/controller-container(/.+)?'
+  - all:
+      - base-branch:
+          - 'main'
+      - changed-files:
+          - any-glob-to-any-file: 'containers/controller/**'
