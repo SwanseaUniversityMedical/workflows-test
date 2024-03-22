@@ -1,17 +1,17 @@
 release:
-  - base-branch:
-      - 'release/.+'
-      - 'maintenance/.+/[0-9]+\.([0-9]+|x)\.x'
+- base-branch:
+  - 'release/.+'
+  - 'maintenance/.+/[0-9]+\.([0-9]+|x)\.x'
 
 trunk:
-  - base-branch:
-      - 'main'
-      - 'maintenance/.+/trunk/[0-9]+\.([0-9]+|x)\.x'
+- base-branch:
+  - 'main'
+  - 'maintenance/.+/trunk/[0-9]+\.([0-9]+|x)\.x'
 
 maintenance:
-  - base-branch:
-      - 'maintenance/.+/.+'
+- base-branch:
+  - 'maintenance/.+/.+'
 
 controller-container:
-  - base-branch:
-      - '.+/controller-container(/.+)?'
+- base-branch:
+  - '.+/controller-container(/.+)?'
