@@ -2,4 +2,4 @@ import logging
 
 
 if __name__ == "__main__":
-    logging.info("hello world")
+    logging.info("hello github")
