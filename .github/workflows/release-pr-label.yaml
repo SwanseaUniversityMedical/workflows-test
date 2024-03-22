@@ -1,4 +1,4 @@
-name: PR Label
+name: Label Release PR
 
 on:
   pull_request:
@@ -6,13 +6,12 @@ on:
       - opened
       - reopened
     branches:
-      - 'main'
       - 'release/*'
       - 'maintenance/*/[0-9]+.x.x'
       - 'maintenance/*/[0-9]+.[0-9]+.x'
 
 jobs:
-  pr-label:
+  label:
     runs-on: ubuntu-latest
     permissions:
       pull-requests: write
