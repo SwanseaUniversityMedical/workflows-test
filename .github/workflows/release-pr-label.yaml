@@ -1,0 +1,28 @@
+name: Label Release PR
+
+on:
+  pull_request:
+    types:
+      - opened
+      - reopened
+    branches:
+      - 'release/*'
+      - 'maintenance/*/[0-9]+.x.x'
+      - 'maintenance/*/[0-9]+.[0-9]+.x'
+
+jobs:
+  label:
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+    steps:
+      - name: clone repo
+        uses: actions/checkout@v4
+
+      - name: add label to pr
+        run: gh pr edit "$NUMBER" --add-label "$LABELS"
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+          NUMBER: ${{ github.event.pull_request.number }}
+          LABELS: release
