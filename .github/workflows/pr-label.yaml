@@ -11,15 +11,11 @@ on:
       - 'maintenance/*/[0-9]+.x.x'
       - 'maintenance/*/[0-9]+.[0-9]+.x'
 
-permissions:
-  pull-requests: write
-
 jobs:
-  label:
-    runs-on:
-      labels: [self-hosted, linux, x64]
-      group: light
-    
+  pr-label:
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
     steps:
       - run: gh pull-request edit "$NUMBER" --add-label "$LABELS"
         env:
