@@ -1,0 +1,28 @@
+name: PR Label
+
+on:
+  pull_request:
+    types:
+      - opened
+      - reopened
+    branches:
+      - 'release/*'
+      - 'maintenance/*/[0-9]+.x.x'
+      - 'maintenance/*/[0-9]+.[0-9]+.x'
+
+permissions:
+  pull-requests: write
+
+jobs:
+  label:
+    runs-on:
+      labels: [self-hosted, linux, x64]
+      group: light
+    
+    steps:
+      - run: gh pull-request edit "$NUMBER" --add-label "$LABELS"
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+          NUMBER: ${{ github.event.issue.number }}
+          LABELS: release
