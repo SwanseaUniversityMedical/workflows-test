@@ -17,7 +17,11 @@ jobs:
     permissions:
       pull-requests: write
     steps:
-      - run: gh pr edit "$NUMBER" --add-label "$LABELS"
+      - name: clone repo
+        uses: actions/checkout@v4
+
+      - name: add label to pr
+        run: gh pr edit "$NUMBER" --add-label "$LABELS"
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GH_REPO: ${{ github.repository }}
