@@ -1,0 +1,56 @@
+name: Fizzbuzz CRDs Chart
+
+on:
+  pull_request:
+    branches-ignore:
+      - '*/controller-container*'
+      - '*/fizzbuzz-chart*'
+    paths:
+      - '.github/workflows/fizzbuzz-crds-chart.yaml'
+      - 'charts/fizzbuzz-crds/**'
+
+  push:
+    branches:
+      - 'maintenance/fizzbuzz-crds-chart/[0-9]+.x.x'
+      - 'maintenance/fizzbuzz-crds-chart/[0-9]+.[0-9]+.x'
+      - 'release/fizzbuzz-crds-chart'
+    paths:
+      - '.github/workflows/fizzbuzz-crds-chart.yaml'
+      - 'charts/fizzbuzz-crds/**'
+
+permissions:
+  contents: write
+  pull-requests: read
+  actions: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  fizzbuzz-crds-chart:
+    uses: SwanseaUniversityMedical/workflows/.github/workflows/pr-and-release-chart.yaml@v1.2.0-charts
+    with:
+      job-name: fizzbuzz-crds-chart
+      registry: ${{ vars.HARBOR_REGISTRY }}
+      registry-user: ${{ vars.HARBOR_USER }}
+      registry-project: ${{ vars.HARBOR_PROJECT }}
+      registry-repo: fizzbuzz-crds
+      release-tag-format: 'fizzbuzz-crds-chart-${version}'
+      release-branches: |
+        [
+          'maintenance/fizzbuzz-crds-chart/[0-9]+\.x\.x',
+          'maintenance/fizzbuzz-crds-chart/[0-9]+\.[0-9]+\.x',
+          'release/fizzbuzz-crds-chart'
+        ]
+      cosign-public-key: ${{ vars.COSIGN_PUBLIC_KEY }}
+      slack-channel: ${{ vars.SLACK_CHANNEL }}
+      chart: charts/fizzbuzz-crds
+      test-command: |
+        helm template $CHART --debug
+
+    secrets:
+      cosign-private-key: ${{ secrets.COSIGN_PRIVATE_KEY }}
+      cosign-password: ${{ secrets.COSIGN_PASSWORD }}
+      registry-token: ${{ secrets.HARBOR_TOKEN }}
+      slack-token: ${{ secrets.SLACK_TOKEN }}
