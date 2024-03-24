@@ -2,7 +2,12 @@ name: Controller Container
 
 on:
   pull_request:
+    branches-ignore:
+      - '*/fizzbuzz-chart*'
+      - '*/fizzbuzz-crds-chart*'
     paths:
+      - '.github/workflows/flake8.yaml'
+      - '.github/workflows/controller-container.yaml'
       - 'containers/controller/**'
   push:
     branches:
@@ -10,6 +15,7 @@ on:
       - 'maintenance/controller-container/[0-9]+.[0-9]+.x'
       - 'release/controller-container'
     paths:
+      - '.github/workflows/controller-container.yaml'
       - 'containers/controller/**'
 
 permissions:
