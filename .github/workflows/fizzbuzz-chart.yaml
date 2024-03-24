@@ -6,6 +6,7 @@ on:
       - '!*/controller-container*'
       - '!*/fizzbuzz-crds-chart*'
     paths:
+      - '.github/workflows/fizzbuzz-chart.yaml'
       - 'charts/fizzbuzz/**'
   push:
     branches:
@@ -13,6 +14,7 @@ on:
       - 'maintenance/fizzbuzz-chart/[0-9]+.[0-9]+.x'
       - 'release/fizzbuzz-chart'
     paths:
+      - '.github/workflows/fizzbuzz-chart.yaml'
       - 'charts/fizzbuzz/**'
 
 permissions:
