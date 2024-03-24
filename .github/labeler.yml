@@ -15,3 +15,11 @@ maintenance:
 controller-container:
 - base-branch:
   - '.+/controller-container(/.+)?'
+
+fizzbuzz-chart:
+- base-branch:
+  - '.+/fizzbuzz-chart(/.+)?'
+
+fizzbuzz-crds-chart:
+- base-branch:
+  - '.+/fizzbuzz-crds-chart(/.+)?'

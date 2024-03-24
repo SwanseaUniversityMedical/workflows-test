@@ -6,6 +6,7 @@ on:
       - '*/fizzbuzz-chart*'
       - '*/fizzbuzz-crds-chart*'
     paths:
+      - '.github/workflows/flake8.yaml'
       - '.github/workflows/controller-container.yaml'
       - 'containers/controller/**'
   push:

@@ -2,9 +2,13 @@ name: Flake8
 
 on:
   pull_request:
+    branches-ignore:
+      - '*/fizzbuzz-chart*'
+      - '*/fizzbuzz-crds-chart*'
     paths:
-      - '.flake8'
-      - 'containers/controller/src/**.py'
+      - '.github/workflows/flake8.yaml'
+      - '.github/workflows/controller-container.yaml'
+      - 'containers/controller/**'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
