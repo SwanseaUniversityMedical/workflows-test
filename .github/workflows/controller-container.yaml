@@ -2,9 +2,9 @@ name: Controller Container
 
 on:
   pull_request:
-    branches:
-      - '!*/fizzbuzz-chart*'
-      - '!*/fizzbuzz-crds-chart*'
+    branches-ignore:
+      - '*/fizzbuzz-chart*'
+      - '*/fizzbuzz-crds-chart*'
     paths:
       - '.github/workflows/controller-container.yaml'
       - 'containers/controller/**'

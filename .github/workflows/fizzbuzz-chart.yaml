@@ -2,9 +2,9 @@ name: Fizzbuzz Chart
 
 on:
   pull_request:
-    branches:
-      - '!*/controller-container*'
-      - '!*/fizzbuzz-crds-chart*'
+    branches-ignore:
+      - '*/controller-container*'
+      - '*/fizzbuzz-crds-chart*'
     paths:
       - '.github/workflows/fizzbuzz-chart.yaml'
       - 'charts/fizzbuzz/**'
