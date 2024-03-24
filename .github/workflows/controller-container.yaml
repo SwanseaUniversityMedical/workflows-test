@@ -2,6 +2,9 @@ name: Controller Container
 
 on:
   pull_request:
+    branches:
+      - '!*/fizzbuzz-chart*'
+      - '!*/fizzbuzz-crds-chart*'
     paths:
       - 'containers/controller/**'
   push:

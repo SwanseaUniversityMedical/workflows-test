@@ -2,6 +2,9 @@ name: Fizzbuzz Chart
 
 on:
   pull_request:
+    branches:
+      - '!*/controller-container*'
+      - '!*/fizzbuzz-crds-chart*'
     paths:
       - 'charts/fizzbuzz/**'
   push:
