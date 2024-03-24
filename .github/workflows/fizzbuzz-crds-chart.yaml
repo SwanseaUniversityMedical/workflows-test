@@ -1,4 +1,4 @@
-name: Fizzbuzz Chart
+name: Fizzbuzz CRDs Chart
 
 on:
   pull_request:
@@ -22,7 +22,7 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  fizzbuzz-chart:
+  fizzbuzz-crds-chart:
     uses: SwanseaUniversityMedical/workflows/.github/workflows/pr-and-release-chart.yaml@v1.2.0-charts
     with:
       job-name: fizzbuzz-crds-chart
