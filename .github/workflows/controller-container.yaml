@@ -23,7 +23,7 @@ concurrency:
 
 jobs:
   controller-container:
-    uses: SwanseaUniversityMedical/workflows/.github/workflows/pr-and-release-container.yaml@v1.4.2-containers
+    uses: SwanseaUniversityMedical/workflows/.github/workflows/pr-and-release-container.yaml@feat/build-cache
     with:
       job-name: controller-container
       registry: ${{ vars.HARBOR_REGISTRY }}
