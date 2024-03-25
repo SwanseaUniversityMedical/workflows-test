@@ -1,0 +1,21 @@
+name: Commit Lint PR Title
+
+on:
+  pull_request:
+    types:
+      - opened
+      - edited
+      - synchronize
+
+jobs:
+  commitlint:
+    runs-on:
+      labels: [self-hosted, linux, x64]
+      group: light
+    steps:
+      - name: lint pr title
+        shell: bash
+        run: |
+          echo "$TITLE" | $(docker run commitlint/commitlint:latest commitlint)
+        env:
+          TITLE: ${ github.event.pull_request.title }
