@@ -22,7 +22,7 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  lint:
+  controller-flake8:
     runs-on:
       labels: [self-hosted, linux, x64]
       group: light
