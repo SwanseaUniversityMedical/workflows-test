@@ -13,6 +13,11 @@ jobs:
       labels: [self-hosted, linux, x64]
       group: light
     steps:
+      - name: install node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
       - name: lint pr title
         shell: bash
         run: |
