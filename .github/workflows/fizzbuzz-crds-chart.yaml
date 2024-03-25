@@ -36,7 +36,9 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  build:
+  # Job name must be unique across repo to target
+  # branch protection rules "required checks" properly!
+  fizzbuzz-crds-chart:
     uses: SwanseaUniversityMedical/workflows/.github/workflows/pr-and-release-chart.yaml@feat/build-cache
     with:
       job-name: fizzbuzz-crds-chart
