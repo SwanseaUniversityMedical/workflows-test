@@ -16,6 +16,6 @@ jobs:
       - name: lint pr title
         shell: bash
         run: |
-          echo "$TITLE" | $(docker run commitlint/commitlint:latest)
+          echo "$TITLE" | $(docker run -i commitlint/commitlint:latest)
         env:
           TITLE: ${ github.event.pull_request.title }
