@@ -13,6 +13,12 @@ jobs:
       labels: [self-hosted, linux, x64]
       group: light
     steps:
+      - name: clone config from repo
+        uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            .github/commitlint.config.js
+
       - name: install node
         uses: actions/setup-node@v4
         with:
@@ -21,6 +27,7 @@ jobs:
       - name: lint pr title
         shell: bash
         run: |
-          echo "$TITLE" | npx commitlint --config .github/commitlint.config.js
+          echo "$TITLE" | npx commitlint --config="$CONFIG"
         env:
           TITLE: ${{ github.event.pull_request.title }}
+          CONFIG: .github/commitlint.config.js
