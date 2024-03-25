@@ -2,18 +2,26 @@ name: Controller Container
 
 on:
   pull_request:
+    # Ignore PRs on branches specifically intended for other assets
     branches-ignore:
       - '*/fizzbuzz-chart*'
       - '*/fizzbuzz-crds-chart*'
+    # Only consider PRs that change files for this asset, including ci scripts
     paths:
       - '.github/workflows/flake8.yaml'
       - '.github/workflows/controller-container.yaml'
       - 'containers/controller/**'
+    # Make sure all workflows that are "required checks" for a given
+    # branch protection rule have the same paths: and branches-ignore:
+    # filters. Otherwise, you can end up in a deadlock waiting on a
+    # required check that will never be executed.
   push:
+    # Only release off of release and maintenance branches for this asset
     branches:
-      - 'maintenance/controller-container/[0-9]+.x.x'
-      - 'maintenance/controller-container/[0-9]+.[0-9]+.x'
+      - 'maintenance/controller-container/release/[0-9]+.x.x'
+      - 'maintenance/controller-container/release/[0-9]+.[0-9]+.x'
       - 'release/controller-container'
+    # Only consider pushes that change files for this asset, including ci scripts
     paths:
       - '.github/workflows/controller-container.yaml'
       - 'containers/controller/**'
@@ -25,10 +33,11 @@ permissions:
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
+  # Needed to generate releases safely
   cancel-in-progress: false
 
 jobs:
-  controller-container:
+  build:
     uses: SwanseaUniversityMedical/workflows/.github/workflows/pr-and-release-container.yaml@feat/build-cache
     with:
       job-name: controller-container
@@ -38,8 +47,7 @@ jobs:
       release-tag-format: 'controller-container-${version}'
       release-branches: |
         [
-          'maintenance/controller-container/[0-9]+\.x\.x',
-          'maintenance/controller-container/[0-9]+\.[0-9]+\.x',
+          'maintenance/controller-container/release/[0-9]+\.([0-9]+|x)\.x',
           'release/controller-container'
         ]
       cosign-public-key: ${{ vars.COSIGN_PUBLIC_KEY }}

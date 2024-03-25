@@ -2,20 +2,27 @@ name: Flake8
 
 on:
   pull_request:
+    # Ignore PRs on branches specifically intended for other assets
     branches-ignore:
       - '*/fizzbuzz-chart*'
       - '*/fizzbuzz-crds-chart*'
+    # Only consider PRs that change files for this asset, including ci scripts
     paths:
       - '.github/workflows/flake8.yaml'
       - '.github/workflows/controller-container.yaml'
       - 'containers/controller/**'
+    # Make sure all workflows that are "required checks" for a given
+    # branch protection rule have the same paths: and branches-ignore:
+    # filters. Otherwise, you can end up in a deadlock waiting on a
+    # required check that will never be executed.
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
+  # This linting can be cancelled if there is a newer commit to lint
   cancel-in-progress: true
 
 jobs:
-  flake8:
+  lint:
     runs-on:
       labels: [self-hosted, linux, x64]
       group: light

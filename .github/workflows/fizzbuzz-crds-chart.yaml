@@ -2,18 +2,25 @@ name: Fizzbuzz CRDs Chart
 
 on:
   pull_request:
+    # Ignore PRs on branches specifically intended for other assets
     branches-ignore:
       - '*/controller-container*'
       - '*/fizzbuzz-chart*'
+    # Only consider PRs that change files for this asset, including ci scripts
     paths:
       - '.github/workflows/fizzbuzz-crds-chart.yaml'
       - 'charts/fizzbuzz-crds/**'
-
+    # Make sure all workflows that are "required checks" for a given
+    # branch protection rule have the same paths: and branches-ignore:
+    # filters. Otherwise, you can end up in a deadlock waiting on a
+    # required check that will never be executed.
   push:
+    # Only release off of release and maintenance branches for this asset
     branches:
-      - 'maintenance/fizzbuzz-crds-chart/[0-9]+.x.x'
-      - 'maintenance/fizzbuzz-crds-chart/[0-9]+.[0-9]+.x'
+      - 'maintenance/fizzbuzz-crds-chart/release/[0-9]+.x.x'
+      - 'maintenance/fizzbuzz-crds-chart/release/[0-9]+.[0-9]+.x'
       - 'release/fizzbuzz-crds-chart'
+    # Only consider pushes that change files for this asset, including ci scripts
     paths:
       - '.github/workflows/fizzbuzz-crds-chart.yaml'
       - 'charts/fizzbuzz-crds/**'
@@ -25,11 +32,12 @@ permissions:
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
+  # Needed to generate releases safely
   cancel-in-progress: false
 
 jobs:
-  fizzbuzz-crds-chart:
-    uses: SwanseaUniversityMedical/workflows/.github/workflows/pr-and-release-chart.yaml@v1.2.0-charts
+  build:
+    uses: SwanseaUniversityMedical/workflows/.github/workflows/pr-and-release-chart.yaml@feat/build-cache
     with:
       job-name: fizzbuzz-crds-chart
       registry: ${{ vars.HARBOR_REGISTRY }}
@@ -39,8 +47,7 @@ jobs:
       release-tag-format: 'fizzbuzz-crds-chart-${version}'
       release-branches: |
         [
-          'maintenance/fizzbuzz-crds-chart/[0-9]+\.x\.x',
-          'maintenance/fizzbuzz-crds-chart/[0-9]+\.[0-9]+\.x',
+          'maintenance/fizzbuzz-crds-chart/release/[0-9]+\.([0-9]+|x)\.x',
           'release/fizzbuzz-crds-chart'
         ]
       cosign-public-key: ${{ vars.COSIGN_PUBLIC_KEY }}
