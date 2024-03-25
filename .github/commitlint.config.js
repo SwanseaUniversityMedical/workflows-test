@@ -1,9 +1,5 @@
-const Configuration = {
+// noinspection JSUnusedGlobalSymbols
+
+export default {
   extends: ['@commitlint/config-conventional'],
-  rules: {
-
-  },
-  defaultIgnores: true
 };
-
-export default Configuration;
