@@ -17,8 +17,8 @@ on:
   push:
     # Only release off of release and maintenance branches for this asset
     branches:
-      - 'maintenance/fizzbuzz-crds-chart/[0-9]+.x.x'
-      - 'maintenance/fizzbuzz-crds-chart/[0-9]+.[0-9]+.x'
+      - 'maintenance/fizzbuzz-crds-chart/release/[0-9]+.x.x'
+      - 'maintenance/fizzbuzz-crds-chart/release/[0-9]+.[0-9]+.x'
       - 'release/fizzbuzz-crds-chart'
     # Only consider pushes that change files for this asset, including ci scripts
     paths:
@@ -37,7 +37,7 @@ concurrency:
 
 jobs:
   build:
-    uses: SwanseaUniversityMedical/workflows/.github/workflows/pr-and-release-chart.yaml@v1.2.0-charts
+    uses: SwanseaUniversityMedical/workflows/.github/workflows/pr-and-release-chart.yaml@feat/build-cache
     with:
       job-name: fizzbuzz-crds-chart
       registry: ${{ vars.HARBOR_REGISTRY }}
