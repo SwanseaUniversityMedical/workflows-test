@@ -1,5 +1,4 @@
-// noinspection JSUnusedGlobalSymbols
 
-export default {
+module.exports = {
   extends: ['@commitlint/config-conventional'],
 };
