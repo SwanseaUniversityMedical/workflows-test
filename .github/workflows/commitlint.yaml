@@ -37,7 +37,7 @@ jobs:
       - name: lint pr title
         shell: bash
         run: |
-          echo "$TITLE" | commitlint --config="$CONFIG"
+          echo "$TITLE" | npx commitlint --config="$CONFIG"
         env:
           TITLE: ${{ github.event.pull_request.title }}
           CONFIG: .github/commitlint.config.js
