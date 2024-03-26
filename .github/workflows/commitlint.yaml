@@ -17,7 +17,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           sparse-checkout: |
-            .github/commitlint.config.js
+            .github/commitlint.config.mjs
 
       - name: cache node modules
         uses: actions/cache@v4.0.2
@@ -42,4 +42,4 @@ jobs:
           echo "$TITLE" | npx commitlint --config="$CONFIG"
         env:
           TITLE: ${{ github.event.pull_request.title }}
-          CONFIG: .github/commitlint.config.js
+          CONFIG: .github/commitlint.config.mjs
