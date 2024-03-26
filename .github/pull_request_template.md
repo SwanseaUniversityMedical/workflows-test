@@ -1,9 +1,8 @@
+
 ## :blue_book: Suggest a change
 
 **Expected behavior/code**
 A clear and concise description of what you are changing.
-
-\U0001F41B
 
 ## :memo: Pre-merge checklist
 Are you ready to merge? Put an `x` in all the boxes that apply:
