@@ -8,7 +8,7 @@ on:
       - synchronize
 
 jobs:
-  commitlint:
+  commitlint-pr-title:
     runs-on:
       labels: [self-hosted, linux, x64]
       group: light
@@ -36,9 +36,22 @@ jobs:
           npm install --save-dev @commitlint/config-conventional @commitlint/cli
 
       - name: lint pr title
+        id: commitlint
         shell: bash
         run: |
           echo "$TITLE" | npx commitlint --config="$CONFIG"
         env:
           TITLE: ${{ github.event.pull_request.title }}
           CONFIG: .github/commitlint.config.js
+
+      - name: annotate commitlint output
+        if: always()
+        shell: bash
+        run: >-
+          echo "::notice title=${{ steps.commitlint.outputs.stdout }}"
+
+      - name: annotate commitlint errors
+        if: always()
+        shell: bash
+        run: >-
+          echo "::error title=${{ steps.commitlint.outputs.stderr }}"
