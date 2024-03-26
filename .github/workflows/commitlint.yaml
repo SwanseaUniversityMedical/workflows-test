@@ -53,7 +53,7 @@ jobs:
               owner: context.repo.owner,
               repo: context.repo.repo,
               name: "FIX PR TITLE",
-              color: "#D93F0B"
+              color: "D93F0B"
             });
 
       - name: Remove error label on successful lint
