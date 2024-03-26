@@ -39,7 +39,7 @@ jobs:
         id: commitlint
         shell: bash
         run: |
-          output=$(echo "$TITLE" | npx commitlint --config="$CONFIG")
+          output=$(echo "$TITLE" | $(npx commitlint --config="$CONFIG" 2>&1 || true))
           echo "output=$output" >> "$GITHUB_OUTPUT"
         env:
           TITLE: ${{ github.event.pull_request.title }}
