@@ -52,7 +52,7 @@ jobs:
             github.rest.issues.createLabel({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              name: "FIX PR TITLE"
+              name: "FIX PR TITLE",
               color: "#D93F0B"
             });
 
@@ -61,11 +61,11 @@ jobs:
         if: success()
         with:
           script: |
-            github.rest.issues.removeLabel({
+            github.rest.issues.removeLabels({
               issue_number: ${{ github.event.pull_request.number }},
               owner: context.repo.owner,
               repo: context.repo.repo,
-              name: ["FIX PR TITLE"]
+              name: "FIX PR TITLE"
             })
 
       - name: Add error label on bad lint
@@ -73,9 +73,9 @@ jobs:
         if: failure()
         with:
           script: |
-            github.rest.issues.addLabel({
+            github.rest.issues.addLabels({
               issue_number: ${{ github.event.pull_request.number }},
               owner: context.repo.owner,
               repo: context.repo.repo,
-              name: ["FIX PR TITLE"]
+              labels: ["FIX PR TITLE"]
             })
