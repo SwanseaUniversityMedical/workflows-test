@@ -44,6 +44,18 @@ jobs:
           TITLE: ${{ github.event.pull_request.title }}
           CONFIG: .github/commitlint.config.mjs
 
+      - name: Create error label
+        uses: actions/github-script@v6
+        if: always()
+        with:
+          script: |
+            github.rest.issues.createLabel({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              name: "FIX PR TITLE"
+              color: "#D93F0B"
+            });
+
       - name: Remove error label on successful lint
         uses: actions/github-script@v6
         if: success()
