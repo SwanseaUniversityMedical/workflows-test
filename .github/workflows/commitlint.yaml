@@ -19,16 +19,25 @@ jobs:
           sparse-checkout: |
             .github/commitlint.config.js
 
+      - name: cache node modules
+        uses: actions/cache@v3
+        with:
+          path: ~/.npm
+
       - name: install node
         uses: actions/setup-node@v4
         with:
           node-version: 20
 
+      - name: install commitlint
+        shell: bash
+        run: |
+          npm install --save-dev @commitlint/config-conventional @commitlint/cli
+
       - name: lint pr title
         shell: bash
         run: |
-          npm install @commitlint/config-conventional
-          echo "$TITLE" | npx @commitlint/commitlint --config="$CONFIG"
+          echo "$TITLE" | commitlint --config="$CONFIG"
         env:
           TITLE: ${{ github.event.pull_request.title }}
           CONFIG: .github/commitlint.config.js
