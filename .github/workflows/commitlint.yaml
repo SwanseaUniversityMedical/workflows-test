@@ -39,16 +39,7 @@ jobs:
         id: commitlint
         shell: bash
         run: |
-          set +e
-          output=$(echo "$TITLE" | npx commitlint --config="$CONFIG" 2>&1)
-          set -e
-          echo "output=$output" >> "$GITHUB_OUTPUT"
+          echo "$TITLE" | npx commitlint --config="$CONFIG"
         env:
           TITLE: ${{ github.event.pull_request.title }}
           CONFIG: .github/commitlint.config.js
-
-      - name: annotate commitlint output
-        if: always()
-        shell: bash
-        run: >-
-          echo "::error title=${{ steps.commitlint.outputs.output }}"
