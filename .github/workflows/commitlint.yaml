@@ -43,3 +43,27 @@ jobs:
         env:
           TITLE: ${{ github.event.pull_request.title }}
           CONFIG: .github/commitlint.config.mjs
+
+      - name: Remove error label on successful lint
+        uses: actions/github-script@v6
+        if: success()
+        with:
+          script: |
+            github.rest.issues.removeLabel({
+              issue_number: context.event.pull_request.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              name: ["FIX PR TITLE"]
+            })
+
+      - name: Add error label on bad lint
+        uses: actions/github-script@v6
+        if: failure()
+        with:
+          script: |
+            github.rest.issues.addLabel({
+              issue_number: context.event.pull_request.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              name: ["FIX PR TITLE"]
+            })
