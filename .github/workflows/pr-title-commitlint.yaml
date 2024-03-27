@@ -7,7 +7,6 @@ on:
       - opened
       - reopened
       - edited
-      - synchronize
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
