@@ -17,8 +17,8 @@ on:
   push:
     # Only release off of release and maintenance branches for this asset
     branches:
-      - 'maintenance/fizzbuzz-crds-chart/release/[0-9]+.x.x'
-      - 'maintenance/fizzbuzz-crds-chart/release/[0-9]+.[0-9]+.x'
+      - 'maintenance/fizzbuzz-crds-chart/[0-9]+.x.x'
+      - 'maintenance/fizzbuzz-crds-chart/[0-9]+.[0-9]+.x'
       - 'main'
     # Only consider pushes that change files for this asset, including ci scripts
     paths:
@@ -49,7 +49,7 @@ jobs:
       release-tag-format: 'fizzbuzz-crds-chart-${version}'
       release-branches: |
         [
-          'maintenance/fizzbuzz-crds-chart/release/[0-9]+\.([0-9]+|x)\.x',
+          'maintenance/fizzbuzz-crds-chart/[0-9]+\.([0-9]+|x)\.x',
           'main'
         ]
       cosign-public-key: ${{ vars.COSIGN_PUBLIC_KEY }}
