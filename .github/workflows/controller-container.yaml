@@ -20,7 +20,7 @@ on:
     branches:
       - 'maintenance/controller-container/release/[0-9]+.x.x'
       - 'maintenance/controller-container/release/[0-9]+.[0-9]+.x'
-      - 'release/controller-container'
+      - 'main'
     # Only consider pushes that change files for this asset, including ci scripts
     paths:
       - '.github/workflows/controller-container.yaml'
@@ -50,7 +50,7 @@ jobs:
       release-branches: |
         [
           'maintenance/controller-container/release/[0-9]+\.([0-9]+|x)\.x',
-          'release/controller-container'
+          'main'
         ]
       cosign-public-key: ${{ vars.COSIGN_PUBLIC_KEY }}
       slack-channel: ${{ vars.SLACK_CHANNEL }}
