@@ -28,7 +28,7 @@ on:
 
 permissions:
   contents: write
-  pull-requests: write
+  pull-requests: read
   actions: read
 
 concurrency:
@@ -40,7 +40,7 @@ jobs:
   # Job name must be unique across repo to target
   # branch protection rules "required checks" properly!
   controller-container:
-    uses: SwanseaUniversityMedical/workflows/.github/workflows/pr-and-release-container.yaml@feat/merge-release
+    uses: SwanseaUniversityMedical/workflows/.github/workflows/pr-and-release-container.yaml@v1.6.0-containers
     with:
       job-name: controller-container
       registry: ${{ vars.HARBOR_REGISTRY }}
@@ -52,15 +52,11 @@ jobs:
           'maintenance/controller-container/release/[0-9]+\.([0-9]+|x)\.x',
           'release/controller-container'
         ]
-      release-app-id: ${{ vars.RELEASE_APP_ID }}
-      release-app-client-id: ${{ vars.RELEASE_APP_CLIENT_ID }}
-      release-app-user: ${{ vars.RELEASE_APP_USER }}
       cosign-public-key: ${{ vars.COSIGN_PUBLIC_KEY }}
       slack-channel: ${{ vars.SLACK_CHANNEL }}
       build-file: containers/controller/Dockerfile
       build-context: containers/controller
     secrets:
-      release-app-private-key: ${{ secrets.RELEASE_APP_PRIVATE_KEY }}
       cosign-private-key: ${{ secrets.COSIGN_PRIVATE_KEY }}
       cosign-password: ${{ secrets.COSIGN_PASSWORD }}
       registry-token: ${{ secrets.HARBOR_TOKEN }}
