@@ -3,20 +3,13 @@
 release:
 - base-branch:
   - 'main'
-  - 'maintenance/.+/release/[0-9]+\.([0-9]+|x)\.x'
-
-# Trunk branches where changes are collected before assets are released
-
-trunk:
-- base-branch:
-  - 'main'
-  - 'maintenance/.+/trunk/[0-9]+\.([0-9]+|x)\.x'
+  - 'maintenance/.+/[0-9]+\.([0-9]+|x)\.x'
 
 # Label any maintenance branch, trunk and release
 
 maintenance:
 - base-branch:
-  - 'maintenance/.+/.+/[0-9]+\.([0-9]+|x)\.x'
+  - 'maintenance/.+/[0-9]+\.([0-9]+|x)\.x'
 
 # Label PRs into the main branch
 
