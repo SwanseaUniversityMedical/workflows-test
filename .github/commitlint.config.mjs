@@ -10,6 +10,7 @@ export default {
         'controller-container',
         'fizzbuzz-chart',
         'fizzbuzz-crds-chart'
-    ]]
+    ]],
+    'subject-case': [RuleConfigSeverity.Error, 'never', []],
   }
 };
