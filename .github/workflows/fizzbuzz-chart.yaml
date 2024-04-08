@@ -39,7 +39,7 @@ jobs:
   # Job name must be unique across repo to target
   # branch protection rules "required checks" properly!
   fizzbuzz-chart:
-    uses: SwanseaUniversityMedical/workflows/.github/workflows/pr-and-release-chart.yaml@v1.3.0-charts
+    uses: SwanseaUniversityMedical/workflows/.github/workflows/pr-and-release-chart.yaml@feat/smaller-semantic-release-container
     with:
       job-name: fizzbuzz-chart
       registry: ${{ vars.HARBOR_REGISTRY }}
