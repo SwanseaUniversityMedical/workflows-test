@@ -40,7 +40,7 @@ jobs:
   # Job name must be unique across repo to target
   # branch protection rules "required checks" properly!
   controller-container:
-    uses: SwanseaUniversityMedical/workflows/.github/workflows/pr-and-release-container.yaml@feat/smaller-semantic-release-container
+    uses: SwanseaUniversityMedical/workflows/.github/workflows/pr-and-release-container.yaml@feat/container-summary
     with:
       job-name: controller-container
       registry: ${{ vars.HARBOR_REGISTRY }}
