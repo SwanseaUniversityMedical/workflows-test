@@ -65,4 +65,3 @@ jobs:
       registry-token: ${{ secrets.HARBOR_TOKEN }}
       slack-token: ${{ secrets.SLACK_TOKEN }}
 
-
