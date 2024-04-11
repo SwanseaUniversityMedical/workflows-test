@@ -1,6 +1,6 @@
 apiVersion: v2
 appVersion: 1.2.3
-description:
-name:
-type:
+description: Fizzbuzz.
+name: fizzbuzz
+type: application
 version: 0.0.0
