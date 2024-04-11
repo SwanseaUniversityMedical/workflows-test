@@ -27,7 +27,7 @@ on:
 
 permissions:
   contents: write
-  pull-requests: read
+  pull-requests: write
   actions: read
 
 concurrency:
@@ -39,9 +39,10 @@ jobs:
   # Job name must be unique across repo to target
   # branch protection rules "required checks" properly!
   fizzbuzz-crds-chart:
-    uses: SwanseaUniversityMedical/workflows/.github/workflows/pr-and-release-chart.yaml@feat/smaller-semantic-release-container
+    uses: SwanseaUniversityMedical/workflows/.github/workflows/pr-and-release-chart.yaml@feat/switch-chart-ci-to-use-step-summaries
     with:
       job-name: fizzbuzz-crds-chart
+      comment-enabled: 'true'
       registry: ${{ vars.HARBOR_REGISTRY }}
       registry-user: ${{ vars.HARBOR_USER }}
       registry-project: ${{ vars.HARBOR_PROJECT }}
