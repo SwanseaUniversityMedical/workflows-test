@@ -64,3 +64,4 @@ jobs:
       cosign-password: ${{ secrets.COSIGN_PASSWORD }}
       registry-token: ${{ secrets.HARBOR_TOKEN }}
       slack-token: ${{ secrets.SLACK_TOKEN }}
+
