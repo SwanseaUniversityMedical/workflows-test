@@ -5,6 +5,7 @@ on:
     # Ignore PRs on branches specifically intended for other assets
     branches-ignore:
       - '*/controller-container*'
+      - '*/trino-container*'
       - '*/fizzbuzz-chart*'
     # Only consider PRs that change files for this asset, including ci scripts
     paths:
