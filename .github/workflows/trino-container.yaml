@@ -1,17 +1,16 @@
-name: Controller Container
+name: Trino Container
 
 on:
   pull_request:
     # Ignore PRs on branches specifically intended for other assets
     branches-ignore:
-      - '*/trino-container*'
+      - '*/controller-container*'
       - '*/fizzbuzz-chart*'
       - '*/fizzbuzz-crds-chart*'
     # Only consider PRs that change files for this asset, including ci scripts
     paths:
-      - '.github/workflows/flake8.yaml'
-      - '.github/workflows/controller-container.yaml'
-      - 'containers/controller/**'
+      - '.github/workflows/trino-container.yaml'
+      - 'containers/trino/**'
     # Make sure all workflows that are "required checks" for a given
     # branch protection rule have the same paths: and branches-ignore:
     # filters. Otherwise, you can end up in a deadlock waiting on a
@@ -19,13 +18,13 @@ on:
   push:
     # Only release off of release and maintenance branches for this asset
     branches:
-      - 'maintenance/controller-container/[0-9]+.x.x'
-      - 'maintenance/controller-container/[0-9]+.[0-9]+.x'
+      - 'maintenance/trino-container/[0-9]+.x.x'
+      - 'maintenance/trino-container/[0-9]+.[0-9]+.x'
       - 'main'
     # Only consider pushes that change files for this asset, including ci scripts
     paths:
-      - '.github/workflows/controller-container.yaml'
-      - 'containers/controller/**'
+      - '.github/workflows/trino-container.yaml'
+      - 'containers/trino/**'
 
 permissions:
   contents: write
@@ -40,23 +39,25 @@ concurrency:
 jobs:
   # Job name must be unique across repo to target
   # branch protection rules "required checks" properly!
-  controller-container:
+  trino-container:
     uses: SwanseaUniversityMedical/workflows/.github/workflows/pr-and-release-container.yaml@feat/extra-release-tags
     with:
-      job-name: controller-container
+      job-name: trino-container
       registry: ${{ vars.HARBOR_REGISTRY }}
       registry-user: ${{ vars.HARBOR_USER }}
-      registry-repo: ${{ vars.HARBOR_PROJECT }}/controller
-      release-tag-format: 'controller-container-${version}'
+      registry-repo: ${{ vars.HARBOR_PROJECT }}/trino
+      release-tag-format: 'trino-container-${version}'
       release-branches: |
         [
-          'maintenance/controller-container/release/[0-9]+\.([0-9]+|x)\.x',
+          'maintenance/trino-container/release/[0-9]+\.([0-9]+|x)\.x',
           'main'
         ]
+      registry-extra-tag-command: |
+        cat containers/trino/Dockerfile | grep ARG | cut -d "=" -f 2
       cosign-public-key: ${{ vars.COSIGN_PUBLIC_KEY }}
       slack-channel: ${{ vars.SLACK_CHANNEL }}
-      build-file: containers/controller/Dockerfile
-      build-context: containers/controller
+      build-file: containers/trino/Dockerfile
+      build-context: containers/trino
     secrets:
       cosign-private-key: ${{ secrets.COSIGN_PRIVATE_KEY }}
       cosign-password: ${{ secrets.COSIGN_PASSWORD }}

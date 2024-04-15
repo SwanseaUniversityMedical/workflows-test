@@ -23,6 +23,10 @@ controller-container:
 - base-branch:
   - '.+/controller-container(/.+)?'
 
+trino-container:
+- base-branch:
+  - '.+/trino-container(/.+)?'
+
 fizzbuzz-chart:
 - base-branch:
   - '.+/fizzbuzz-chart(/.+)?'

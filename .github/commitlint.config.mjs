@@ -8,6 +8,7 @@ export default {
         '',
         'deps',
         'controller-container',
+        'trino-container',
         'fizzbuzz-chart',
         'fizzbuzz-crds-chart'
     ]],
