@@ -1,6 +1,6 @@
 ## :construction: Suggest a change
 
-    A clear and concise description of what you are changing.
+A clear and concise description of what you are changing.
 
 ## :memo: Pre-merge checklist
 
