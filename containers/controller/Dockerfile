@@ -15,4 +15,3 @@ COPY src/ /opt/
 
 ENTRYPOINT ["python3", "/opt/controller.py"]
 #CMD ["--help"]
-# test
