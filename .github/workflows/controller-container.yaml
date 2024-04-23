@@ -44,6 +44,8 @@ jobs:
     uses: SwanseaUniversityMedical/workflows/.github/workflows/pr-and-release-container.yaml@feat/inuit-auto
     with:
       job-name: controller-container
+      comment-pr: "true"
+      comment-release: "true"
       registry: ${{ vars.HARBOR_REGISTRY }}
       registry-user: ${{ vars.HARBOR_USER }}
       registry-repo: ${{ vars.HARBOR_PROJECT }}/controller
