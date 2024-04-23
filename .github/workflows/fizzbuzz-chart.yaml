@@ -43,7 +43,8 @@ jobs:
     uses: SwanseaUniversityMedical/workflows/.github/workflows/pr-and-release-chart.yaml@feat/inuit-auto
     with:
       job-name: fizzbuzz-chart
-      comment-enabled: 'true'
+      comment-pr: "true"
+      comment-release: "true"
       registry: ${{ vars.HARBOR_REGISTRY }}
       registry-user: ${{ vars.HARBOR_USER }}
       registry-project: ${{ vars.HARBOR_PROJECT }}
