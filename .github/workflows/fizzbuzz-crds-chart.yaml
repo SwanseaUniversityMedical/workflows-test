@@ -1,4 +1,4 @@
-name: Fizzbuzz CRDs Chart
+name: Build Fizzbuzz CRDs Chart
 
 on:
   pull_request:
@@ -33,8 +33,9 @@ permissions:
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
-  # Needed to generate releases safely
-  cancel-in-progress: false
+  # Cancel early on pull requests if new commits are added,
+  # Don't cancel on release pushes
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
   # Job name must be unique across repo to target
