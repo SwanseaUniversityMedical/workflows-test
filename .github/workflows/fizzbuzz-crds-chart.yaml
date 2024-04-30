@@ -1,4 +1,4 @@
-name: Fizzbuzz CRDs Chart
+name: Build Fizzbuzz CRDs Chart
 
 on:
   pull_request:

@@ -1,4 +1,4 @@
-name: Controller Container
+name: Build Controller Container
 
 on:
   pull_request:

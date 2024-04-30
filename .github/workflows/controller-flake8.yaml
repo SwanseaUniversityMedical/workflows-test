@@ -1,4 +1,4 @@
-name: Flake8
+name: Lint Controller Flake8
 
 on:
   pull_request:

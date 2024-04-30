@@ -1,4 +1,4 @@
-name: Fizzbuzz Chart
+name: Build Fizzbuzz Chart
 
 on:
   pull_request:

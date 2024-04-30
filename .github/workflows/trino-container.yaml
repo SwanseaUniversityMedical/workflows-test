@@ -1,4 +1,4 @@
-name: Trino Container
+name: Build Trino Container
 
 on:
   pull_request:
