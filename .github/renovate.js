@@ -46,4 +46,15 @@ module.exports = {
   ],
 
   // Rest of the config goes here...
+  hostRules: [
+    // Add a set of credentials for accessing docker or oci helm registries like harbor.
+    // These registry tokens should be read-only, they only need to be able to look up
+    // what versions are available. Pretty much all our repos will need this config!
+    {
+      hostType: "docker",
+      domainName: process.env.RENOVATE_HARBOR_REGISTRY,
+      username: process.env.RENOVATE_HARBOR_USER,
+      password: process.env.RENOVATE_HARBOR_TOKEN
+    },
+  ]
 };
