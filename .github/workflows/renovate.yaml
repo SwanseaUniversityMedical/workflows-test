@@ -5,12 +5,6 @@ on:
   schedule:
     - cron: '0 * * * *'
 
-permissions:
-  actions: write
-  contents: write
-  issues: write
-  pull-requests: write
-
 concurrency:
   group: ${{ github.workflow }}
   cancel-in-progress: false
@@ -22,12 +16,8 @@ jobs:
       group: heavy
 
     steps:
-      - name: clone repo
-        uses: actions/checkout@v4
-
-      - name: renovate
-        uses: renovatebot/github-action@v40.1.12
+      - uses: SwanseaUniversityMedical/workflows/.github/actions/renovate@feat/renovate
         with:
-          configurationFile: .github/renovate.js
           token: ${{ secrets.RENOVATE_TOKEN }}
-          env-regex: "^(?:RENOVATE_\\w+|LOG_LEVEL|\\w+_PROXY)$"
+        env:
+          RENOVATE_SOME_TOKEN: "xxxxxx"
