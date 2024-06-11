@@ -1,0 +1,32 @@
+name: Renovate Bot
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 * * * *'
+
+permissions:
+  contents: write
+  issues: write
+  pull-requests: write
+
+concurrency:
+  group: ${{ github.workflow }}
+  cancel-in-progress: false
+
+jobs:
+  renovate:
+    runs-on:
+      labels: [self-hosted, linux, x64]
+      group: heavy
+
+    steps:
+      - name: clone repo
+        uses: actions/checkout@v4
+
+      - name: renovate
+        uses: renovatebot/github-action@v40.1.12
+        with:
+          configurationFile: .github/renovate.js
+          token: ${{ github.token }}
+          env-regex: "^(?:RENOVATE_\\w+|LOG_LEVEL|\\w+_PROXY)$"
