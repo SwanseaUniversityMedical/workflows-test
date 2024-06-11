@@ -29,5 +29,5 @@ jobs:
         uses: renovatebot/github-action@v40.1.12
         with:
           configurationFile: .github/renovate.js
-          token: ${{ github.token }}
+          token: ${{ secrets.RENOVATE_TOKEN }}
           env-regex: "^(?:RENOVATE_\\w+|LOG_LEVEL|\\w+_PROXY)$"
