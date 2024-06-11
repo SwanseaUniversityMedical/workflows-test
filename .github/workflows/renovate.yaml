@@ -2,6 +2,8 @@ name: Renovate Bot
 
 on:
   pull_request:
+    paths:
+      - '.github/workflows/renovate.yaml'
   workflow_dispatch:
   schedule:
     - cron: '0 * * * *'
@@ -17,7 +19,7 @@ jobs:
       group: heavy
 
     steps:
-      - uses: SwanseaUniversityMedical/workflows/.github/actions/renovate@feat/renovate
+      - uses: SwanseaUniversityMedical/workflows/.github/actions/renovate@v1.0.0-renovate
         with:
           token: ${{ secrets.RENOVATE_TOKEN }}
         env:
