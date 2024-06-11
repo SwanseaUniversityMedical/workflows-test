@@ -22,5 +22,5 @@ jobs:
           token: ${{ secrets.RENOVATE_TOKEN }}
         env:
           RENOVATE_HARBOR_REGISTRY: ${{ vars.HARBOR_REGISTRY }}
-          RENOVATE_HARBOR_USER: ${{ secrets.HARBOR_USER }}
+          RENOVATE_HARBOR_USER: ${{ vars.HARBOR_USER }}
           RENOVATE_HARBOR_TOKEN: ${{ secrets.HARBOR_TOKEN }}
