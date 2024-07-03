@@ -21,7 +21,7 @@ jobs:
     steps:
       - uses: SwanseaUniversityMedical/workflows/.github/actions/renovate@v1.0.0-renovate
         with:
-          token: ${{ secrets.RENOVATE_TOKEN }}
+          token: ${{ github.token }}
         env:
           RENOVATE_HARBOR_REGISTRY: ${{ vars.HARBOR_REGISTRY }}
           RENOVATE_HARBOR_USER: ${{ vars.HARBOR_USER }}
