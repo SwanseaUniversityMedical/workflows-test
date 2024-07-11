@@ -48,7 +48,8 @@ jobs:
       release-tag-format: 'v${version}'
 
   controller-container:
-    uses: SwanseaUniversityMedical/workflows/.github/workflows/pr-and-release-container.yaml@v2.0.1-containers
+    needs: setup-release
+    uses: SwanseaUniversityMedical/workflows/.github/workflows/bulk-pr-and-release-container.yaml@feat/allow-for-functionality-to-support-releasing-multiple-assets-bundled-with-the-same-tag
     with:
       job-name: controller-container
       comment-pr: "true"
@@ -57,6 +58,7 @@ jobs:
       registry-user: ${{ vars.HARBOR_USER }}
       registry-repo: ${{ vars.HARBOR_PROJECT }}/controller
       release-tag-format: 'v${version}-controller-container'
+      release-info: ${{ needs.setup-release.outputs.release-info }}
       cosign-public-key: ${{ vars.COSIGN_PUBLIC_KEY }}
       build-file: containers/controller/Dockerfile
       build-context: containers/controller
