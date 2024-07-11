@@ -10,7 +10,7 @@ on:
     # Only consider PRs that change files for this asset, including ci scripts
     paths:
       - '.github/workflows/flake8.yaml'
-      - '.github/workflows/controller-container.yaml'
+      - '.github/workflows/multi-container-test.yaml'
       - 'containers/controller/**'
     # Make sure all workflows that are "required checks" for a given
     # branch protection rule have the same paths: and branches-ignore:
@@ -24,7 +24,7 @@ on:
       - 'main'
     # Only consider pushes that change files for this asset, including ci scripts
     paths:
-      - '.github/workflows/controller-container.yaml'
+      - '.github/workflows/multi-container-test.yaml'
       - 'containers/controller/**'
 
 permissions:
