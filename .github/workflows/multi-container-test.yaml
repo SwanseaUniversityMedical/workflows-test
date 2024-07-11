@@ -12,6 +12,7 @@ on:
       - '.github/workflows/flake8.yaml'
       - '.github/workflows/multi-container-test.yaml'
       - 'containers/controller/**'
+      - 'containers/trino/**'
     # Make sure all workflows that are "required checks" for a given
     # branch protection rule have the same paths: and branches-ignore:
     # filters. Otherwise, you can end up in a deadlock waiting on a
@@ -26,6 +27,7 @@ on:
     paths:
       - '.github/workflows/multi-container-test.yaml'
       - 'containers/controller/**'
+      - 'containers/trino/**'
 
 permissions:
   contents: write
@@ -62,6 +64,28 @@ jobs:
       cosign-public-key: ${{ vars.COSIGN_PUBLIC_KEY }}
       build-file: containers/controller/Dockerfile
       build-context: containers/controller
+    secrets:
+      cosign-private-key: ${{ secrets.COSIGN_PRIVATE_KEY }}
+      cosign-password: ${{ secrets.COSIGN_PASSWORD }}
+      registry-token: ${{ secrets.HARBOR_TOKEN }}
+
+  trino-container:
+    needs: setup-release
+    uses: SwanseaUniversityMedical/workflows/.github/workflows/bulk-pr-and-release-container.yaml@feat/allow-for-functionality-to-support-releasing-multiple-assets-bundled-with-the-same-tag
+    with:
+      job-name: trino-container
+      comment-pr: "true"
+      comment-release: "true"
+      registry: ${{ vars.HARBOR_REGISTRY }}
+      registry-user: ${{ vars.HARBOR_USER }}
+      registry-repo: ${{ vars.HARBOR_PROJECT }}/trino
+      release-tag-format: 'v${version}-trino-container'
+      registry-extra-tag-command: >-
+        cat containers/trino/Dockerfile | grep -m 1 "ARG BASE_VERSION=" | cut -d "=" -f 2
+      release-info: ${{ needs.setup-release.outputs.release-info }}
+      cosign-public-key: ${{ vars.COSIGN_PUBLIC_KEY }}
+      build-file: containers/trino/Dockerfile
+      build-context: containers/trino
     secrets:
       cosign-private-key: ${{ secrets.COSIGN_PRIVATE_KEY }}
       cosign-password: ${{ secrets.COSIGN_PASSWORD }}
