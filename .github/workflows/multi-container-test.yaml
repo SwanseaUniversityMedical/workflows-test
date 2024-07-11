@@ -47,7 +47,7 @@ jobs:
     uses: SwanseaUniversityMedical/workflows/.github/workflows/pr-and-release-repo.yaml@feat/allow-for-functionality-to-support-releasing-multiple-assets-bundled-with-the-same-tag
     with:
       job-name: setup-release
-      release-tag-format: 'v${version}'
+      release-tag-format: 'v${version}-bulk-release-test'
 
   controller-container:
     needs: setup-release
