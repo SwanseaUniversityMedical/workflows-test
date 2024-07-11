@@ -41,8 +41,12 @@ concurrency:
 jobs:
   # Job name must be unique across repo to target
   # branch protection rules "required checks" properly!
-  release:
+  setup-release:
     uses: SwanseaUniversityMedical/workflows/.github/workflows/pr-and-release-repo.yaml@feat/allow-for-functionality-to-support-releasing-multiple-assets-bundled-with-the-same-tag
+    with:
+      job-name: setup-release
+      release-tag-format: 'v${version}'
+
   controller-container:
     uses: SwanseaUniversityMedical/workflows/.github/workflows/pr-and-release-container.yaml@v2.0.1-containers
     with:
