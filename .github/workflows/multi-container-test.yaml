@@ -82,7 +82,7 @@ jobs:
       release-tag-format: 'v${version}-trino-container'
       registry-extra-tag-command: >-
         cat containers/trino/Dockerfile | grep -m 1 "ARG BASE_VERSION=" | cut -d "=" -f 2
-      release-info: ${{ needs.setup-release.outputs.release-info }}
+      release-info: ${{ needs.setup-release.outputs.git-tag }}
       cosign-public-key: ${{ vars.COSIGN_PUBLIC_KEY }}
       build-file: containers/trino/Dockerfile
       build-context: containers/trino
