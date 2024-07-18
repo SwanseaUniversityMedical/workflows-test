@@ -2,17 +2,13 @@ name: Build multiple containers
 
 on:
   pull_request:
-    # Ignore PRs on branches specifically intended for other assets
-    branches-ignore:
-      - '*/trino-container*'
-      - '*/fizzbuzz-chart*'
-      - '*/fizzbuzz-crds-chart*'
     # Only consider PRs that change files for this asset, including ci scripts
     paths:
       - '.github/workflows/flake8.yaml'
       - '.github/workflows/multi-container-test.yaml'
       - 'containers/controller/**'
       - 'containers/trino/**'
+      - 'charts/fizzbuzz/**'
     # Make sure all workflows that are "required checks" for a given
     # branch protection rule have the same paths: and branches-ignore:
     # filters. Otherwise, you can end up in a deadlock waiting on a
@@ -20,8 +16,6 @@ on:
   push:
     # Only release off of release and maintenance branches for this asset
     branches:
-      - 'maintenance/controller-container/[0-9]+.x.x'
-      - 'maintenance/controller-container/[0-9]+.[0-9]+.x'
       - 'main'
     # Only consider pushes that change files for this asset, including ci scripts
     paths:
@@ -60,7 +54,6 @@ jobs:
       registry: ${{ vars.HARBOR_REGISTRY }}
       registry-user: ${{ vars.HARBOR_USER }}
       registry-repo: ${{ vars.HARBOR_PROJECT }}/controller
-      release-tag-format: 'v${version}-controller-container'
       release-info: ${{ needs.setup-release.outputs.release-info }}
       cosign-public-key: ${{ vars.COSIGN_PUBLIC_KEY }}
       build-file: containers/controller/Dockerfile
@@ -80,7 +73,6 @@ jobs:
       registry: ${{ vars.HARBOR_REGISTRY }}
       registry-user: ${{ vars.HARBOR_USER }}
       registry-repo: ${{ vars.HARBOR_PROJECT }}/trino
-      release-tag-format: 'v${version}-trino-container'
       registry-extra-tag-command: >-
         cat containers/trino/Dockerfile | grep -m 1 "ARG BASE_VERSION=" | cut -d "=" -f 2
       release-info: ${{ needs.setup-release.outputs.release-info }}
@@ -103,7 +95,6 @@ jobs:
       registry-user: ${{ vars.HARBOR_USER }}
       registry-project: ${{ vars.HARBOR_PROJECT }}
       registry-repo: fizzbuzz
-      release-tag-format: 'v${version}-fizzbuzz-chart'
       release-info: ${{ needs.setup-release.outputs.release-info }}
       cosign-public-key: ${{ vars.COSIGN_PUBLIC_KEY }}
       chart: charts/fizzbuzz
