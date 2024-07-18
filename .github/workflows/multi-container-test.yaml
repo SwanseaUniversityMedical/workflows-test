@@ -38,14 +38,14 @@ concurrency:
 jobs:
   # Job name must be unique across repo to target
   # branch protection rules "required checks" properly!
-  setup-release:
+  setup:
     uses: SwanseaUniversityMedical/workflows/.github/workflows/pr-and-release-repo.yaml@feat/allow-for-functionality-to-support-releasing-multiple-assets-bundled-with-the-same-tag
     with:
-      job-name: setup-release
+      job-name: setup
       release-tag-format: 'v${version}-bulk-release-test'
 
   controller-container:
-    needs: setup-release
+    needs: setup
     uses: SwanseaUniversityMedical/workflows/.github/workflows/bulk-pr-and-release-container.yaml@feat/allow-for-functionality-to-support-releasing-multiple-assets-bundled-with-the-same-tag
     with:
       job-name: controller-container
@@ -54,7 +54,7 @@ jobs:
       registry: ${{ vars.HARBOR_REGISTRY }}
       registry-user: ${{ vars.HARBOR_USER }}
       registry-repo: ${{ vars.HARBOR_PROJECT }}/controller
-      release-info: ${{ needs.setup-release.outputs.release-info }}
+      release-info: ${{ needs.setup.outputs.release-info }}
       cosign-public-key: ${{ vars.COSIGN_PUBLIC_KEY }}
       build-file: containers/controller/Dockerfile
       build-context: containers/controller
@@ -64,7 +64,7 @@ jobs:
       registry-token: ${{ secrets.HARBOR_TOKEN }}
 
   trino-container:
-    needs: setup-release
+    needs: setup
     uses: SwanseaUniversityMedical/workflows/.github/workflows/bulk-pr-and-release-container.yaml@feat/allow-for-functionality-to-support-releasing-multiple-assets-bundled-with-the-same-tag
     with:
       job-name: trino-container
@@ -75,7 +75,7 @@ jobs:
       registry-repo: ${{ vars.HARBOR_PROJECT }}/trino
       registry-extra-tag-command: >-
         cat containers/trino/Dockerfile | grep -m 1 "ARG BASE_VERSION=" | cut -d "=" -f 2
-      release-info: ${{ needs.setup-release.outputs.release-info }}
+      release-info: ${{ needs.setup.outputs.release-info }}
       cosign-public-key: ${{ vars.COSIGN_PUBLIC_KEY }}
       build-file: containers/trino/Dockerfile
       build-context: containers/trino
@@ -85,7 +85,7 @@ jobs:
       registry-token: ${{ secrets.HARBOR_TOKEN }}
 
   fizzbuzz-chart:
-    needs: setup-release
+    needs: setup
     uses: SwanseaUniversityMedical/workflows/.github/workflows/bulk-pr-and-release-chart.yaml@feat/allow-for-functionality-to-support-releasing-multiple-assets-bundled-with-the-same-tag
     with:
       job-name: fizzbuzz-chart
@@ -95,7 +95,7 @@ jobs:
       registry-user: ${{ vars.HARBOR_USER }}
       registry-project: ${{ vars.HARBOR_PROJECT }}
       registry-repo: fizzbuzz
-      release-info: ${{ needs.setup-release.outputs.release-info }}
+      release-info: ${{ needs.setup.outputs.release-info }}
       cosign-public-key: ${{ vars.COSIGN_PUBLIC_KEY }}
       chart: charts/fizzbuzz
       test-command: |
