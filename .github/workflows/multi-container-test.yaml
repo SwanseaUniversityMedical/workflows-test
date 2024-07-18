@@ -28,6 +28,7 @@ on:
       - '.github/workflows/multi-container-test.yaml'
       - 'containers/controller/**'
       - 'containers/trino/**'
+      - 'charts/fizzbuzz/**'
 
 permissions:
   contents: write
@@ -91,3 +92,25 @@ jobs:
       cosign-password: ${{ secrets.COSIGN_PASSWORD }}
       registry-token: ${{ secrets.HARBOR_TOKEN }}
 
+  fizzbuzz-chart:
+    needs: setup-release
+    uses: SwanseaUniversityMedical/workflows/.github/workflows/bulk-pr-and-release-chart.yaml@feat/allow-for-functionality-to-support-releasing-multiple-assets-bundled-with-the-same-tag
+    with:
+      job-name: fizzbuzz-chart
+      comment-pr: "true"
+      comment-release: "true"
+      registry: ${{ vars.HARBOR_REGISTRY }}
+      registry-user: ${{ vars.HARBOR_USER }}
+      registry-project: ${{ vars.HARBOR_PROJECT }}
+      registry-repo: fizzbuzz
+      release-tag-format: 'v${version}-fizzbuzz-chart'
+      release-info: ${{ needs.setup-release.outputs.release-info }}
+      cosign-public-key: ${{ vars.COSIGN_PUBLIC_KEY }}
+      chart: charts/fizzbuzz
+      test-command: |
+        helm template $CHART --debug
+
+    secrets:
+      cosign-private-key: ${{ secrets.COSIGN_PRIVATE_KEY }}
+      cosign-password: ${{ secrets.COSIGN_PASSWORD }}
+      registry-token: ${{ secrets.HARBOR_TOKEN }}
