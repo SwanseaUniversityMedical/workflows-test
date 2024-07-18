@@ -39,14 +39,14 @@ jobs:
   # Job name must be unique across repo to target
   # branch protection rules "required checks" properly!
   setup:
-    uses: SwanseaUniversityMedical/workflows/.github/workflows/pr-and-release-repo.yaml@feat/allow-for-functionality-to-support-releasing-multiple-assets-bundled-with-the-same-tag
+    uses: SwanseaUniversityMedical/workflows/.github/workflows/pr-and-release-repo.yaml@v1.0.0-repo
     with:
       job-name: setup
       release-tag-format: 'v${version}-bulk-release-test'
 
   controller-container:
     needs: setup
-    uses: SwanseaUniversityMedical/workflows/.github/workflows/bulk-pr-and-release-container.yaml@feat/allow-for-functionality-to-support-releasing-multiple-assets-bundled-with-the-same-tag
+    uses: SwanseaUniversityMedical/workflows/.github/workflows/bulk-pr-and-release-container.yaml@v1.0.0-bulk-containers
     with:
       job-name: controller-container
       comment-pr: "true"
@@ -65,7 +65,7 @@ jobs:
 
   trino-container:
     needs: setup
-    uses: SwanseaUniversityMedical/workflows/.github/workflows/bulk-pr-and-release-container.yaml@feat/allow-for-functionality-to-support-releasing-multiple-assets-bundled-with-the-same-tag
+    uses: SwanseaUniversityMedical/workflows/.github/workflows/bulk-pr-and-release-container.yaml@v1.0.0-bulk-containers
     with:
       job-name: trino-container
       comment-pr: "true"
@@ -79,7 +79,6 @@ jobs:
       cosign-public-key: ${{ vars.COSIGN_PUBLIC_KEY }}
       build-file: containers/trino/Dockerfile
       build-context: containers/trino
-      test-flags: error
     secrets:
       cosign-private-key: ${{ secrets.COSIGN_PRIVATE_KEY }}
       cosign-password: ${{ secrets.COSIGN_PASSWORD }}
@@ -87,7 +86,7 @@ jobs:
 
   fizzbuzz-chart:
     needs: setup
-    uses: SwanseaUniversityMedical/workflows/.github/workflows/bulk-pr-and-release-chart.yaml@feat/allow-for-functionality-to-support-releasing-multiple-assets-bundled-with-the-same-tag
+    uses: SwanseaUniversityMedical/workflows/.github/workflows/bulk-pr-and-release-chart.yaml@v1.0.0-bulk-charts
     with:
       job-name: fizzbuzz-chart
       comment-pr: "true"
@@ -100,7 +99,7 @@ jobs:
       cosign-public-key: ${{ vars.COSIGN_PUBLIC_KEY }}
       chart: charts/fizzbuzz
       test-command: |
-        helm templat
+        helm template $CHART --debug
 
     secrets:
       cosign-private-key: ${{ secrets.COSIGN_PRIVATE_KEY }}
