@@ -1,6 +1,6 @@
 FROM alpine:3.20
 
-COPY src/requirements.txt /opt/requirements.txt
+#COPY src/requirements.txt /opt/requirements.txt
 
 RUN apk update && \
     apk add --update --no-cache python3 py3-pip && \
