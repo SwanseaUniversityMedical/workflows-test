@@ -60,7 +60,6 @@ jobs:
       registry: ${{ vars.HARBOR_REGISTRY }}
       registry-user: ${{ vars.HARBOR_USER }}
       registry-repo: ${{ vars.HARBOR_PROJECT }}/controller
-      release-tag-format: 'v${version}-controller-container'
       release-info: ${{ needs.setup-release.outputs.release-info }}
       cosign-public-key: ${{ vars.COSIGN_PUBLIC_KEY }}
       build-file: containers/controller/Dockerfile
@@ -80,7 +79,6 @@ jobs:
       registry: ${{ vars.HARBOR_REGISTRY }}
       registry-user: ${{ vars.HARBOR_USER }}
       registry-repo: ${{ vars.HARBOR_PROJECT }}/trino
-      release-tag-format: 'v${version}-trino-container'
       registry-extra-tag-command: >-
         cat containers/trino/Dockerfile | grep -m 1 "ARG BASE_VERSION=" | cut -d "=" -f 2
       release-info: ${{ needs.setup-release.outputs.release-info }}
@@ -103,7 +101,6 @@ jobs:
       registry-user: ${{ vars.HARBOR_USER }}
       registry-project: ${{ vars.HARBOR_PROJECT }}
       registry-repo: fizzbuzz
-      release-tag-format: 'v${version}-fizzbuzz-chart'
       release-info: ${{ needs.setup-release.outputs.release-info }}
       cosign-public-key: ${{ vars.COSIGN_PUBLIC_KEY }}
       chart: charts/fizzbuzz
