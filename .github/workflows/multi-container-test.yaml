@@ -79,6 +79,8 @@ jobs:
       cosign-public-key: ${{ vars.COSIGN_PUBLIC_KEY }}
       build-file: containers/trino/Dockerfile
       build-context: containers/trino
+      test-command: |
+        this will error
     secrets:
       cosign-private-key: ${{ secrets.COSIGN_PRIVATE_KEY }}
       cosign-password: ${{ secrets.COSIGN_PASSWORD }}
@@ -99,7 +101,7 @@ jobs:
       cosign-public-key: ${{ vars.COSIGN_PUBLIC_KEY }}
       chart: charts/fizzbuzz
       test-command: |
-        helm template $CHART --debug
+        helm templat
 
     secrets:
       cosign-private-key: ${{ secrets.COSIGN_PRIVATE_KEY }}
