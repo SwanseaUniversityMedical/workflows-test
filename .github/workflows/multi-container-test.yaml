@@ -79,8 +79,7 @@ jobs:
       cosign-public-key: ${{ vars.COSIGN_PUBLIC_KEY }}
       build-file: containers/trino/Dockerfile
       build-context: containers/trino
-      test-command: |
-        this will error
+      test-flags: error
     secrets:
       cosign-private-key: ${{ secrets.COSIGN_PRIVATE_KEY }}
       cosign-password: ${{ secrets.COSIGN_PASSWORD }}
