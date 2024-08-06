@@ -1,0 +1,22 @@
+name: Test runners
+
+on:
+  pull_request:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  # This linting can be cancelled if there is a newer commit to lint
+  cancel-in-progress: true
+
+jobs:
+  test-runners:
+    runs-on:
+      labels: [self-hosted, linux, x64]
+      group: test
+    
+    steps:
+      - name: clone repo
+        uses: actions/checkout@v4
+          
+      - run: |
+          echo "Hello world"
