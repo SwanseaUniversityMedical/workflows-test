@@ -10,9 +10,7 @@ concurrency:
 
 jobs:
   test-runners:
-    runs-on:
-      labels: [self-hosted, linux, x64]
-      group: test
+    runs-on: test
     
     steps:
       - name: clone repo
