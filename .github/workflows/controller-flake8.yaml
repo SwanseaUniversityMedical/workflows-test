@@ -23,7 +23,7 @@ concurrency:
 
 jobs:
   controller-flake8:
-    runs-on: "k8s-dev-linux-default" 
+    runs-on: "feda-linux-default"
     
     steps:
       - name: clone repo
