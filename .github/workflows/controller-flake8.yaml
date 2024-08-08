@@ -23,9 +23,7 @@ concurrency:
 
 jobs:
   controller-flake8:
-    runs-on:
-      labels: [self-hosted, linux, x64]
-      group: light
+    runs-on: "k8s-dev-linux-default"
     
     steps:
       - name: clone repo
