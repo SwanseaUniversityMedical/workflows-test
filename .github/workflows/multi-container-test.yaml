@@ -39,14 +39,14 @@ jobs:
   # Job name must be unique across repo to target
   # branch protection rules "required checks" properly!
   setup:
-    uses: SwanseaUniversityMedical/workflows/.github/workflows/pr-and-release-repo.yaml@v1.0.0-repo
+    uses: SwanseaUniversityMedical/workflows/.github/workflows/pr-and-release-repo.yaml@feat/runs-on-input
     with:
       job-name: setup
       release-tag-format: 'v${version}-bulk-release-test'
 
   controller-container:
     needs: setup
-    uses: SwanseaUniversityMedical/workflows/.github/workflows/bulk-pr-and-release-container.yaml@v1.0.0-bulk-containers
+    uses: SwanseaUniversityMedical/workflows/.github/workflows/bulk-pr-and-release-container.yaml@feat/runs-on-input
     with:
       job-name: controller-container
       comment-pr: "true"
@@ -65,7 +65,7 @@ jobs:
 
   trino-container:
     needs: setup
-    uses: SwanseaUniversityMedical/workflows/.github/workflows/bulk-pr-and-release-container.yaml@v1.0.0-bulk-containers
+    uses: SwanseaUniversityMedical/workflows/.github/workflows/bulk-pr-and-release-container.yaml@feat/runs-on-input
     with:
       job-name: trino-container
       comment-pr: "true"
@@ -86,7 +86,7 @@ jobs:
 
   fizzbuzz-chart:
     needs: setup
-    uses: SwanseaUniversityMedical/workflows/.github/workflows/bulk-pr-and-release-chart.yaml@v1.0.0-bulk-charts
+    uses: SwanseaUniversityMedical/workflows/.github/workflows/bulk-pr-and-release-chart.yaml@feat/runs-on-input
     with:
       job-name: fizzbuzz-chart
       comment-pr: "true"
