@@ -23,7 +23,7 @@ concurrency:
 
 jobs:
   controller-flake8:
-    runs-on: "feda-linux-default" 
+    runs-on: "feda-linux-default"
     
     steps:
       - name: clone repo
@@ -37,4 +37,4 @@ jobs:
           
       - name: run flake8
         run: |
-          python3 -m flake8 containers/controller/src
+          flake8 containers/controller/src
