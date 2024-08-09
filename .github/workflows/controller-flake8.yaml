@@ -37,4 +37,4 @@ jobs:
           
       - name: run flake8
         run: |
-          flake8 containers/controller/src
+          python3 -m flake8 containers/controller/src
