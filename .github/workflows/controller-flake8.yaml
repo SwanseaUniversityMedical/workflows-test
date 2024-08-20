@@ -23,9 +23,7 @@ concurrency:
 
 jobs:
   controller-flake8:
-    runs-on:
-      labels: [self-hosted, linux, x64]
-      group: light
+    runs-on: "ubuntu-latest"
     
     steps:
       - name: clone repo
@@ -39,4 +37,4 @@ jobs:
           
       - name: run flake8
         run: |
-          flake8 containers/controller/src
+          python3 -m flake8 containers/controller/src
