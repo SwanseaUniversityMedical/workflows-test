@@ -23,7 +23,7 @@ concurrency:
 
 jobs:
   controller-flake8:
-    runs-on: "ubuntu"
+    runs-on: "ubuntu-latest"
     
     steps:
       - name: clone repo
