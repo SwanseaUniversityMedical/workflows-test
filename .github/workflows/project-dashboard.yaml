@@ -32,7 +32,7 @@ jobs:
           env:
             GITHUB_TOKEN: ${{ secrets.DASHBOARD_TEST_TOKEN }}
         - run: "echo 'latest release: ${{ steps.get_board.outputs.data }}'"
-  add-issues:
+  get-repos:
     needs: get-board
     runs-on:
       labels: [ self-hosted, linux, x64 ]
@@ -47,8 +47,7 @@ jobs:
           script: |
             publicRepositories = []
             github.graphql(`
-                viewer {
-                    repositories(privacy: PUBLIC) {
+                    repositories(owner:"SwanseaUniversityMedical", privacy: PUBLIC) {
                       pageInfo {
                         endCursor
                         hasNextPage
@@ -57,14 +56,13 @@ jobs:
                             name
                         }
                     }  
-                }
               `) 
             
               //add the first page of repositories to the list
                 publicRepositories.push(data.repositories.nodes)
             while (pageInfo.hasNextPage) {
-                github.graphql(`viewer {
-                    repositories(privacy: PUBLIC, after: "${pageInfo.endCursor}") {
+                github.graphql(`
+                    repositories(owner:"SwanseaUniversityMedical", privacy: PUBLIC, after: "${pageInfo.endCursor}") {
                         pageInfo {
                           endCursor
                           hasNextPage
@@ -72,8 +70,7 @@ jobs:
                         nodes {
                             name
                         }
-                    }
-                }`)}
+                    }`)}
                 publicRepositories.push(data.repositories.nodes)
             
 #            //get all issues within the repositories
