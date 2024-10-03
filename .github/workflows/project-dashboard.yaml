@@ -14,7 +14,9 @@ concurrency:
 
 jobs:
   get-board:
-    runs-on: ubuntu-latest
+    runs-on:
+      labels: [ self-hosted, linux, x64 ]
+      group: heavy
     steps:
         - uses: octokit/graphql-action@v2.x
           id: get_board
