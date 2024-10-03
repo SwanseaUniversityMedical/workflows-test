@@ -76,43 +76,43 @@ jobs:
                 }`)}
                 publicRepositories.push(data.repositories.nodes)
             
-            //get all issues within the repositories
-            issues = []
-            for (let i = 0; i < publicRepositories.length; i++) {
-                github.graphql(`
-                query {
-                    repository(owner: "owner", name: "${publicRepositories[i].name}") {
-                        issues(first: 100) {
-                            nodes {
-                                id
-                            }
-                        }
-                            pageInfo {
-                            endCursor
-                            hasNextPage
-                        }
-                    }
-                }
-                `)
-                issues.push(data.repository.issues.nodes)
-                while (pageInfo.hasNextPage) {
-                    github.graphql(`
-                    query {
-                        repository(owner: "owner", name: "${publicRepositories[i].name}") {
-                            issues(first: 100, after: "${pageInfo.endCursor}") {
-                                nodes {
-                                    id
-                                }
-                            }
-                            pageInfo {
-                                endCursor
-                                hasNextPage
-                            }
-                        }
-                    }
-                    `)
-                    issues.push(data.repository.issues.nodes)
-                }
+#            //get all issues within the repositories
+#            issues = []
+#            for (let i = 0; i < publicRepositories.length; i++) {
+#                github.graphql(`
+#                query {
+#                    repository(owner: "owner", name: "${publicRepositories[i].name}") {
+#                        issues(first: 100) {
+#                            nodes {
+#                                id
+#                            }
+#                        }
+#                            pageInfo {
+#                            endCursor
+#                            hasNextPage
+#                        }
+#                    }
+#                }
+#                `)
+#                issues.push(data.repository.issues.nodes)
+#                while (pageInfo.hasNextPage) {
+#                    github.graphql(`
+#                    query {
+#                        repository(owner: "owner", name: "${publicRepositories[i].name}") {
+#                            issues(first: 100, after: "${pageInfo.endCursor}") {
+#                                nodes {
+#                                    id
+#                                }
+#                            }
+#                            pageInfo {
+#                                endCursor
+#                                hasNextPage
+#                            }
+#                        }
+#                    }
+#                    `)
+#                    issues.push(data.repository.issues.nodes)
+#                }
 
 #  add-prs:
 #    needs: get-board
