@@ -28,5 +28,5 @@ jobs:
                 }
               }
           env:
-            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+            GITHUB_TOKEN: ${{ secrets.DASHBOARD_TEST_TOKEN }}
         - run: "echo 'latest release: ${{ steps.get_board.outputs.data }}'"
