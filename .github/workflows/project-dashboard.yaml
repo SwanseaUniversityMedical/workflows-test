@@ -1,0 +1,33 @@
+name: Project Dashboard
+
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/project-dashboard.yaml'
+  workflow_dispatch:
+  schedule:
+    - cron: '0 * * * *'
+
+concurrency:
+  group: ${{ github.workflow }}
+  cancel-in-progress: false
+
+jobs:
+  get-board:
+    runs-on: ubuntu-latest
+    id: board
+    steps:
+        - uses: octokit/graphql-action@v2.x
+          id: get_board
+          with:
+            query: |
+              query {
+                organization(login: "SwanseaUniversityMedical") {
+                  projectV2(number: 15) {
+                    id
+                  }
+                }
+              }
+          env:
+            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        - run: "echo 'latest release: ${{ steps.get_board.outputs.data }}'"
