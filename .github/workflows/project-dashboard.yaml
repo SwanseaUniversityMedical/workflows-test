@@ -71,34 +71,34 @@ jobs:
               }
             }`) 
             
-              //add the first page of repositories to the list
-                publicRepositories.push(data.repositories.nodes)
-            while (data.pageInfo.hasNextPage) {
-                data = github.graphql(`query Repos($cursor: String) {
-                repositoryOwner(login: "SwanseaUniversityMedical") {
-                    repositories(
-                        first: 100
-                        ownerAffiliations: OWNER
-                        privacy: PUBLIC
-                        isFork: false
-                        isLocked: false
-                        orderBy: { field: NAME, direction: ASC }
-                        after: $cursor
-                    ) {
-                        totalCount
-                                    
-                        pageInfo {
-                            hasNextPage
-                            endCursor
-                        }
-                                    
-                        nodes {
-                            name
-                        }
-                    }
-                }
-            }`)}
-                publicRepositories.push(data.repositories.nodes)
+#              //add the first page of repositories to the list
+#                publicRepositories.push(data.repositories.nodes)
+#            while (data.pageInfo.hasNextPage) {
+#                data = github.graphql(`query Repos($cursor: String) {
+#                repositoryOwner(login: "SwanseaUniversityMedical") {
+#                    repositories(
+#                        first: 100
+#                        ownerAffiliations: OWNER
+#                        privacy: PUBLIC
+#                        isFork: false
+#                        isLocked: false
+#                        orderBy: { field: NAME, direction: ASC }
+#                        after: $cursor
+#                    ) {
+#                        totalCount
+#
+#                        pageInfo {
+#                            hasNextPage
+#                            endCursor
+#                        }
+#
+#                        nodes {
+#                            name
+#                        }
+#                    }
+#                }
+#            }`)}
+#                publicRepositories.push(data.repositories.nodes)
             
 #            //get all issues within the repositories
 #            issues = []
