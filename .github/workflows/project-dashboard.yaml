@@ -47,31 +47,31 @@ jobs:
           script: |
             publicRepositories = []
             github.graphql(`
-                query {
+                viewer {
                     repositories(privacy: PUBLIC) {
+                      pageInfo {
+                        endCursor
+                        hasNextPage
+                      }
                         nodes {
                             name
                         }
-                    }
-                    pageInfo {
-                    endCursor
-                    hasNextPage
-                  }
+                    }  
                 }
               `) 
             
               //add the first page of repositories to the list
                 publicRepositories.push(data.repositories.nodes)
             while (pageInfo.hasNextPage) {
-                github.graphql(`query {
+                github.graphql(`viewer {
                     repositories(privacy: PUBLIC, after: "${pageInfo.endCursor}") {
+                        pageInfo {
+                          endCursor
+                          hasNextPage
+                      }
                         nodes {
                             name
                         }
-                    }
-                    pageInfo {
-                        endCursor
-                        hasNextPage
                     }
                 }`)}
                 publicRepositories.push(data.repositories.nodes)
