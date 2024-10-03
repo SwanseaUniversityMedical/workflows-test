@@ -46,7 +46,7 @@ jobs:
 
   controller-container:
     needs: setup
-    uses: SwanseaUniversityMedical/workflows/.github/workflows/bulk-pr-and-release-container.yaml@v1.0.0-bulk-containers
+    uses: SwanseaUniversityMedical/workflows/.github/workflows/bulk-pr-and-release-container.yaml@fix/bulk-release-null-info
     with:
       job-name: controller-container
       comment-pr: "true"
@@ -54,7 +54,7 @@ jobs:
       registry: ${{ vars.HARBOR_REGISTRY }}
       registry-user: ${{ vars.HARBOR_USER }}
       registry-repo: ${{ vars.HARBOR_PROJECT }}/controller
-      release-info: ${{ needs.setup.outputs.release-info }}
+      release-info: ""
       cosign-public-key: ${{ vars.COSIGN_PUBLIC_KEY }}
       build-file: containers/controller/Dockerfile
       build-context: containers/controller
@@ -65,7 +65,7 @@ jobs:
 
   trino-container:
     needs: setup
-    uses: SwanseaUniversityMedical/workflows/.github/workflows/bulk-pr-and-release-container.yaml@v1.0.0-bulk-containers
+    uses: SwanseaUniversityMedical/workflows/.github/workflows/bulk-pr-and-release-container.yaml@fix/bulk-release-null-info
     with:
       job-name: trino-container
       comment-pr: "true"
@@ -86,7 +86,7 @@ jobs:
 
   fizzbuzz-chart:
     needs: setup
-    uses: SwanseaUniversityMedical/workflows/.github/workflows/bulk-pr-and-release-chart.yaml@v1.0.0-bulk-charts
+    uses: SwanseaUniversityMedical/workflows/.github/workflows/bulk-pr-and-release-chart.yaml@fix/bulk-release-null-info
     with:
       job-name: fizzbuzz-chart
       comment-pr: "true"
