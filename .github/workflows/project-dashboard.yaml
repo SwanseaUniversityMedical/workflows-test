@@ -46,7 +46,7 @@ jobs:
           retry-exempt-status-codes: 400,401
           script: |
             publicRepositories = []
-            github.graphql(`
+            github.graphql(`query {
                     repositories(owner:"SwanseaUniversityMedical", privacy: PUBLIC) {
                       pageInfo {
                         endCursor
@@ -56,12 +56,13 @@ jobs:
                             name
                         }
                     }  
+            }
               `) 
             
               //add the first page of repositories to the list
                 publicRepositories.push(data.repositories.nodes)
             while (pageInfo.hasNextPage) {
-                github.graphql(`
+                github.graphql(`query {
                     repositories(owner:"SwanseaUniversityMedical", privacy: PUBLIC, after: "${pageInfo.endCursor}") {
                         pageInfo {
                           endCursor
@@ -70,6 +71,7 @@ jobs:
                         nodes {
                             name
                         }
+            }
                     }`)}
                 publicRepositories.push(data.repositories.nodes)
             
