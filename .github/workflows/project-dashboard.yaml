@@ -45,27 +45,86 @@ jobs:
           retries: 3
           retry-exempt-status-codes: 400,401
           script: |
-            import { Octokit } from "octokit";
+            publicRepositories = []
+            github.graphql(`
+                query {
+                    repositories(privacy: PUBLIC) {
+                        nodes {
+                            name
+                        }
+                    }
+                    pageInfo {
+                    endCursor
+                    hasNextPage
+                  }
+                }
+              `) 
+            
+              //add the first page of repositories to the list
+                publicRepositories.push(data.repositories.nodes)
+            while (pageInfo.hasNextPage) {
+                github.graphql(`query {
+                    repositories(privacy: PUBLIC, after: "${pageInfo.endCursor}") {
+                        nodes {
+                            name
+                        }
+                    }
+                    pageInfo {
+                        endCursor
+                        hasNextPage
+                    }
+                }`)}
+                publicRepositories.push(data.repositories.nodes)
+            
+            //get all issues within the repositories
+            issues = []
+            for (let i = 0; i < publicRepositories.length; i++) {
+                github.graphql(`
+                query {
+                    repository(owner: "owner", name: "${publicRepositories[i].name}") {
+                        issues(first: 100) {
+                            nodes {
+                                id
+                            }
+                        }
+                            pageInfo {
+                            endCursor
+                            hasNextPage
+                        }
+                    }
+                }
+                `)
+                issues.push(data.repository.issues.nodes)
+                while (pageInfo.hasNextPage) {
+                    github.graphql(`
+                    query {
+                        repository(owner: "owner", name: "${publicRepositories[i].name}") {
+                            issues(first: 100, after: "${pageInfo.endCursor}") {
+                                nodes {
+                                    id
+                                }
+                            }
+                            pageInfo {
+                                endCursor
+                                hasNextPage
+                            }
+                        }
+                    }
+                    `)
+                    issues.push(data.repository.issues.nodes)
+                }
 
-            const octokit = new Octokit({ 
-              auth: ${{ secrets.DASHBOARD_TEST_TOKEN }},
-            });
-
-  add-prs:
-    needs: get-board
-    runs-on:
-      labels: [ self-hosted, linux, x64 ]
-      group: heavy
-    steps:
-      - uses: actions/github-script@v7
-        id: my-script
-        with:
-          result-encoding: string
-          retries: 3
-          retry-exempt-status-codes: 400,401
-          script: |
-            import { Octokit } from "octokit";
-
-            const octokit = new Octokit({ 
-              auth: ${{ secrets.DASHBOARD_TEST_TOKEN }},
-            });
+#  add-prs:
+#    needs: get-board
+#    runs-on:
+#      labels: [ self-hosted, linux, x64 ]
+#      group: heavy
+#    steps:
+#      - uses: actions/github-script@v7
+#        id: my-script
+#        with:
+#          result-encoding: string
+#          retries: 3
+#          retry-exempt-status-codes: 400,401
+#          script: |
+#            github.graphql
