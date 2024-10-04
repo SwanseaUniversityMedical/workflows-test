@@ -38,6 +38,22 @@ jobs:
       labels: [ self-hosted, linux, x64 ]
       group: heavy
     steps:
+      - name: install node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: cache node modules
+        uses: actions/cache@v4.0.2
+        with:
+          path: ~/.npm
+          key: ${{ github.workflow }}-dashboard
+
+      - name: install octokit
+        shell: bash
+        run: |
+          npm install @octokit/core @octokit/plugin-paginate-graphql
+
       - uses: actions/github-script@v7
         id: first-page
         with:
@@ -45,9 +61,11 @@ jobs:
           retries: 3
           retry-exempt-status-codes: 400,401
           script: |
-            const MyOctokit = github.graphql.plugin(paginateGraphql);
+            import { Octokit } from "@octokit/core";
+            import { paginateGraphQL } from "@octokit/plugin-paginate-graphql";
+            const MyOctokit = Octokit.plugin(paginateGraphql);
             const octokit = new MyOctokit({ auth: ${{ secrets.DASHBOARD_TEST_TOKEN }} });
-            const { repositories } = await octokit.paginate(`query Repos($cursor: String) {
+            const { repositories } = await octokit.graphql.paginate(`query Repos($cursor: String) {
               repositoryOwner(login: "SwanseaUniversityMedical") {
                   repositories(
                       first: 100
