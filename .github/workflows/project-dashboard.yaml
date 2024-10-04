@@ -73,9 +73,9 @@ jobs:
             
             
             //add the first page of repositories to the list
-            publicRepositories.push(data.repositories.nodes)
+            publicRepositories.push(repos.repositories.nodes)
             while (data.pageInfo.hasNextPage) {
-                data = await github.graphql(`query Repos($cursor: String) {
+                const data = await github.graphql(`query Repos($cursor: String) {
                 repositoryOwner(login: "SwanseaUniversityMedical") {
                     repositories(
                         first: 100
