@@ -46,7 +46,7 @@ jobs:
           retry-exempt-status-codes: 400,401
           script: |
             const publicRepositories = []
-            const repos = await github.graphql(`query Repos($cursor: String) {
+            const { repositories } = await github.graphql.paginate(`query Repos($cursor: String) {
               repositoryOwner(login: "SwanseaUniversityMedical") {
                   repositories(
                       first: 100
@@ -56,9 +56,7 @@ jobs:
                       isLocked: false
                       orderBy: { field: NAME, direction: ASC }
                       after: $cursor
-                  ) {
-                      totalCount
-                                  
+                  ) {                                 
                       pageInfo {
                           hasNextPage
                           endCursor
@@ -71,35 +69,36 @@ jobs:
               }
             }`)
             
+            console.log(`Found ${repositories.repositories.nodes.length} repos!`);
             
-            //add the first page of repositories to the list
-            publicRepositories.push(repos.repositories.nodes)
-            while (data.pageInfo.hasNextPage) {
-                const data = await github.graphql(`query Repos($cursor: String) {
-                repositoryOwner(login: "SwanseaUniversityMedical") {
-                    repositories(
-                        first: 100
-                        ownerAffiliations: OWNER
-                        privacy: PUBLIC
-                        isFork: false
-                        isLocked: false
-                        orderBy: { field: NAME, direction: ASC }
-                        after: $cursor
-                    ) {
-                        totalCount
-
-                        pageInfo {
-                            hasNextPage
-                            endCursor
-                        }
-
-                        nodes {
-                            name
-                        }
-                    }
-                }
-            }`)}
-            publicRepositories.push(data.repositories.nodes)
+#            //add the first page of repositories to the list
+#            publicRepositories.push(repos.repositories.nodes)
+#            while (repos.pageInfo.hasNextPage) {
+#                const repos = await github.graphql(`query Repos($cursor: String) {
+#                repositoryOwner(login: "SwanseaUniversityMedical") {
+#                    repositories(
+#                        first: 100
+#                        ownerAffiliations: OWNER
+#                        privacy: PUBLIC
+#                        isFork: false
+#                        isLocked: false
+#                        orderBy: { field: NAME, direction: ASC }
+#                        after: $cursor
+#                    ) {
+#                        totalCount
+#
+#                        pageInfo {
+#                            hasNextPage
+#                            endCursor
+#                        }
+#
+#                        nodes {
+#                            name
+#                        }
+#                    }
+#                }
+#            }`)}
+#            publicRepositories.push(repos.repositories.nodes)
             
 #            //get all issues within the repositories
 #            issues = []
