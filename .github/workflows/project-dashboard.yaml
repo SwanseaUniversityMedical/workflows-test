@@ -16,7 +16,7 @@ jobs:
   get-board:
     runs-on:
       labels: [ self-hosted, linux, x64 ]
-      group: heavy
+      group: light
     steps:
         - uses: octokit/graphql-action@v2.x
           id: get_board
