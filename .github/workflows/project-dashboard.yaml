@@ -60,8 +60,10 @@ jobs:
           retries: 3
           retry-exempt-status-codes: 400,401
           script: |
-            import { Octokit } from "@octokit/core";
-            import { paginateGraphQL } from "@octokit/plugin-paginate-graphql";
+            <script type="module">
+            import { Octokit } from "https://esm.sh/@octokit/core";
+            import { paginateGraphQL } from "https://esm.sh/@octokit/plugin-paginate-graphql";
+            </script>
             const { repositories } = await github.graphql.paginate.iterator(`query Repos($cursor: String) {
               repositoryOwner(login: "SwanseaUniversityMedical") {
                   repositories(
