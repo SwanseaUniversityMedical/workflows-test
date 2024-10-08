@@ -75,7 +75,7 @@ jobs:
             }
 
             return repositories.join(', '); // Return as a comma-separated string
-      - run: "echo 'retrived: ${{ steps.first-page.outputs.result }}'"
+      - run: "echo 'retrived: ${{ steps.public-repos.outputs.result }}'"
 
               
             
