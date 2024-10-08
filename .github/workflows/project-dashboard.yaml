@@ -62,9 +62,6 @@ jobs:
           retries: 3
           retry-exempt-status-codes: 400,401
           script: |
-            let repositories = [];
-            let hasNextPage = true;
-            let cursor = "";
             const octokit = require('octokit/core');
             octokit.plugin(paginateGraphQL);
             octokit.authenticate({
