@@ -37,7 +37,7 @@ jobs:
       labels: [ self-hosted, linux, x64 ]
       group: heavy
     steps:
-      
+
       - uses: actions/github-script@v7
         id: first-page
         env:
@@ -48,7 +48,7 @@ jobs:
           retry-exempt-status-codes: 400,401
           script: |
             const query = `query Search($cursor: String) {
-              search(query: "org:SwanseaUniversityMedical fork:false", type: REPOSITORY, first: 100, after: $cursor) {
+              search(query: "org:SwanseaUniversityMedical", type: REPOSITORY, first: 100, after: $cursor) {
                 pageInfo {
                   hasNextPage
                   endCursor
