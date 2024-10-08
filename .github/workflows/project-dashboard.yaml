@@ -65,27 +65,19 @@ jobs:
             let cursor = "";
 
             while (hasNextPage) {
-              const response = await github.graphql(`query Repos($cursor: String) {
-              repositoryOwner(login: "SwanseaUniversityMedical") {
-                repositories(
-                first: 100
-                ownerAffiliations: OWNER
-                privacy: PUBLIC
-                isFork: false
-                isLocked: false
-                orderBy: { field: NAME, direction: ASC }
-                after: $cursor
-                ) {                                 
-                pageInfo {
+                const response = await github.graphql(`query Search($query: String!) {
+                search(query: $query, type: REPOSITORY, first: 100) {
+                  pageInfo {
                   hasNextPage
                   endCursor
+                  }
+                  nodes {
+                  ... on Repository {
+                    name
+                  }
+                  }
                 }
-                nodes {
-                  name
-                }
-                }
-              }
-              }`, { cursor });
+                }`, { query: "org:SwanseaUniversityMedical is:public fork:false" });
               
               repositories.push(...response.data.repositoryOwner.repositories.nodes);
               hasNextPage = response.data.repositoryOwner.repositories.pageInfo.hasNextPage;
