@@ -89,8 +89,8 @@ jobs:
               cursor = response.search.pageInfo.endCursor;
             }
 
-            return repositories;
-      - run: "echo 'retrived: ${{ steps.first-page.outputs.data }}'"
+            return repositories.join(', '); // Return as a comma-separated string
+      - run: "echo 'retrived: ${{ steps.first-page.outputs.result }}'"
 
               
             
