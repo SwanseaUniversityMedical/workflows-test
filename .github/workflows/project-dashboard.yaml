@@ -62,32 +62,34 @@ jobs:
           retries: 3
           retry-exempt-status-codes: 400,401
           script: |
-            const { Octokit } = require('@octokit/core');
-            const { paginateGraphQL } = require('@octokit/plugin-paginate-graphql');
-
-            const MyOctokit = Octokit.plugin(paginateGraphQL);
-            const octokit = new MyOctokit({ auth: process.env.GITHUB_TOKEN });
-            const cursor = null; // Define the cursor variable
-            const { repositories } = await octokit.graphql.paginate(`query Search($cursor: String) {
-                search(query: "org:SwanseaUniversityMedical is:public fork:false", type: REPOSITORY, first: 100, after: $cursor) {
-                  pageInfo {
+            const query = `query Search($cursor: String) {
+              search(query: "org:SwanseaUniversityMedical is:public fork:false", type: REPOSITORY, first: 100, after: $cursor) {
+                pageInfo {
                   hasNextPage
                   endCursor
-                  },
-                  repos: edges {
+                },
+                repos: edges {
                   node {
                     ... on Repository {
-                    name
+                      name
                     }
                   }
-                  }
                 }
-                }`, { cursor });
-              
-            //add the repositories to the list
-            const publicRepositories = [];
-            publicRepositories.push(repositories.map(repo => repo.node.name));
-            return publicRepositories;
+              }
+            }`;
+
+            let cursor = null;
+            let hasNextPage = true;
+            const repositories = [];
+
+            while (hasNextPage) {
+              const response = await github.graphql(query, { cursor });
+              repositories.push(...response.search.repos.map(repo => repo.node.name));
+              hasNextPage = response.search.pageInfo.hasNextPage;
+              cursor = response.search.pageInfo.endCursor;
+            }
+
+            return repositories;
       - run: "echo 'retrived: ${{ steps.first-page.outputs.data }}'"
 
               
