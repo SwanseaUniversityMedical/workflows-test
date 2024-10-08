@@ -68,6 +68,7 @@ jobs:
               token: process.env.GITHUB_TOKEN
             });
             const paginateGraphQL = require('octokit/plugin-paginate-graphql');
+            const cursor = null; // Define the cursor variable
             const { repositories } = await octokit.graphql.paginate(`query Search($cursor: String) {
                 search(query: "org:SwanseaUniversityMedical is:public fork:false", type: REPOSITORY, first: 100, after: $cursor) {
                   pageInfo {
@@ -84,12 +85,15 @@ jobs:
                 }
                 }`, { cursor });
               
-              repositories.push(...response.data.search.repos.map(repo => repo.node.name));
-              hasNextPage = response.data.search.pageInfo.hasNextPage;
-              cursor = response.data.search.pageInfo.endCursor;
-            }
+            //add the repositories to the list
+            const publicRepositories = [];
+            publicRepositories.push(repositories.map(repo => repo.node.name));
+            return publicRepositories;
+      - run: "echo 'retrived: ${{ steps.first-page.outputs.data }}'"
+
+              
             
-            console.log(`Found ${repositories.repositories.nodes.length} repos!`);
+
             
 #            //add the first page of repositories to the list
 #            publicRepositories.push(repos.repositories.nodes)
