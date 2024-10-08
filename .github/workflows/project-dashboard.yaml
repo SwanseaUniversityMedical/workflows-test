@@ -62,12 +62,11 @@ jobs:
           retries: 3
           retry-exempt-status-codes: 400,401
           script: |
-            const octokit = require('@octokit/core');
-            octokit.plugin(paginateGraphQL);
-            octokit.authenticate({
-              token: process.env.GITHUB_TOKEN
-            });
-            const paginateGraphQL = require('octokit/plugin-paginate-graphql');
+            const { Octokit } = require('@octokit/core');
+            const { paginateGraphQL } = require('@octokit/plugin-paginate-graphql');
+
+            const MyOctokit = Octokit.plugin(paginateGraphQL);
+            const octokit = new MyOctokit({ auth: process.env.GITHUB_TOKEN });
             const cursor = null; // Define the cursor variable
             const { repositories } = await octokit.graphql.paginate(`query Search($cursor: String) {
                 search(query: "org:SwanseaUniversityMedical is:public fork:false", type: REPOSITORY, first: 100, after: $cursor) {
