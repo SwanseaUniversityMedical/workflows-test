@@ -62,7 +62,7 @@ jobs:
           script: |
             const hasNextPage = true
             const cursor = ""
-            const { repositories }
+            const { repositories };
             while (hasNextPage = true) {
              const { repositories } += await github.graphql(`query Repos($cursor: String) {
               repositoryOwner(login: "SwanseaUniversityMedical") {
