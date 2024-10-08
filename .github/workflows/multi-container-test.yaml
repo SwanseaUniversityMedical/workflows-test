@@ -46,7 +46,7 @@ jobs:
 
   controller-container:
     needs: setup
-    uses: SwanseaUniversityMedical/workflows/.github/workflows/bulk-pr-and-release-container.yaml@v1.0.0-bulk-containers
+    uses: SwanseaUniversityMedical/workflows/.github/workflows/bulk-pr-and-release-container.yaml@v1.0.1-bulk-containers
     with:
       job-name: controller-container
       comment-pr: "true"
@@ -65,7 +65,7 @@ jobs:
 
   trino-container:
     needs: setup
-    uses: SwanseaUniversityMedical/workflows/.github/workflows/bulk-pr-and-release-container.yaml@v1.0.0-bulk-containers
+    uses: SwanseaUniversityMedical/workflows/.github/workflows/bulk-pr-and-release-container.yaml@v1.0.1-bulk-containers
     with:
       job-name: trino-container
       comment-pr: "true"
