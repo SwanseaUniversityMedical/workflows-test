@@ -60,32 +60,35 @@ jobs:
           retries: 3
           retry-exempt-status-codes: 400,401
           script: |
-            const hasNextPage = true
-            const cursor = ""
-            const { repositories };
-            while (hasNextPage = true) {
-             const { repositories } += await github.graphql(`query Repos($cursor: String) {
+            let repositories;
+            let hasNextPage = true;
+            let cursor = "";
+            while (hasNextPage) {
+              const response = await github.graphql(`query Repos($cursor: String) {
               repositoryOwner(login: "SwanseaUniversityMedical") {
-                  repositories(
-                      first: 100
-                      ownerAffiliations: OWNER
-                      privacy: PUBLIC
-                      isFork: false
-                      isLocked: false
-                      orderBy: { field: NAME, direction: ASC }
-                      after: $cursor
-                  ) {                                 
-                      pageInfo {
-                          hasNextPage
-                          endCursor
-                      }
-                                  
-                      nodes {
-                          name
-                      }
-                  }
+                repositories(
+                first: 100
+                ownerAffiliations: OWNER
+                privacy: PUBLIC
+                isFork: false
+                isLocked: false
+                orderBy: { field: NAME, direction: ASC }
+                after: $cursor
+                ) {                                 
+                pageInfo {
+                  hasNextPage
+                  endCursor
+                }
+                nodes {
+                  name
+                }
+                }
               }
-            }`)
+              }`, { cursor });
+              
+              repositories += response.data.repositoryOwner.repositories.nodes;
+              hasNextPage = response.data.repositoryOwner.repositories.pageInfo.hasNextPage;
+              cursor = response.data.repositoryOwner.repositories.pageInfo.endCursor;
             }
             
             console.log(`Found ${repositories.repositories.nodes.length} repos!`);
