@@ -57,6 +57,7 @@ jobs:
                   node {
                     ... on Repository {
                       name
+                      isPrivate
                     }
                   }
                 }
