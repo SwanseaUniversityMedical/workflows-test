@@ -55,6 +55,8 @@ jobs:
 
       - uses: actions/github-script@v7
         id: first-page
+        env:
+          GITHUB_TOKEN: ${{ secrets.DASHBOARD_TEST_TOKEN }}
         with:
           result-encoding: string
           retries: 3
