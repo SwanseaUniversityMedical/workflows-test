@@ -81,9 +81,9 @@ jobs:
                 }
                 }`, { cursor });
               
-              repositories.push(...response.data.repositoryOwner.repositories.nodes);
-              hasNextPage = response.data.repositoryOwner.repositories.pageInfo.hasNextPage;
-              cursor = response.data.repositoryOwner.repositories.pageInfo.endCursor;
+              repositories.push(...response.data.search.repos.nodes);
+              hasNextPage = response.data.search.pageInfo.hasNextPage;
+              cursor = response.data.search.pageInfo.endCursor;
             }
             
             console.log(`Found ${repositories.repositories.nodes.length} repos!`);
