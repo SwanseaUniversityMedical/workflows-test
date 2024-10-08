@@ -60,9 +60,10 @@ jobs:
           retries: 3
           retry-exempt-status-codes: 400,401
           script: |
-            let repositories;
+            let repositories = [];
             let hasNextPage = true;
             let cursor = "";
+
             while (hasNextPage) {
               const response = await github.graphql(`query Repos($cursor: String) {
               repositoryOwner(login: "SwanseaUniversityMedical") {
@@ -86,7 +87,7 @@ jobs:
               }
               }`, { cursor });
               
-              repositories += response.data.repositoryOwner.repositories.nodes;
+              repositories.push(...response.data.repositoryOwner.repositories.nodes);
               hasNextPage = response.data.repositoryOwner.repositories.pageInfo.hasNextPage;
               cursor = response.data.repositoryOwner.repositories.pageInfo.endCursor;
             }
