@@ -45,6 +45,15 @@ module.exports = {
     "SwanseaUniversityMedical/workflows-test",
   ],
 
+  packageRules: [
+    {
+      groupName: "workflows non-major dependencies",
+      groupSlug: "workflows-minor-patch",
+      matchPackageNames: ["SwanseaUniversityMedical/workflows"],
+      matchUpdateTypes: ["minor", "patch"]
+    }
+  ]
+
   // Rest of the config goes here...
   hostRules: [
     // Add a set of credentials for accessing docker or oci helm registries like harbor.
