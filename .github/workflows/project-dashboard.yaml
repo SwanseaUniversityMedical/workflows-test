@@ -1,0 +1,148 @@
+name: Project Dashboard
+
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/project-dashboard.yaml'
+  workflow_dispatch:
+  schedule:
+    - cron: '0 * * * *'
+
+concurrency:
+  group: ${{ github.workflow }}
+  cancel-in-progress: false
+
+jobs:
+  dashboard:
+    runs-on:
+      labels: [ self-hosted, linux, x64 ]
+      group: light
+    steps:
+
+      - uses: actions/github-script@v7
+        id: dashboard-updater
+        env:
+          GITHUB_TOKEN: ${{ secrets.DASHBOARD_TEST_TOKEN }}
+        with:
+          result-encoding: string
+          retries: 3
+          retry-exempt-status-codes: 400,401
+          github-token: ${{ secrets.DASHBOARD_TEST_TOKEN }}
+          script: |
+            const query = `query Search($cursor: String) {
+              search(query: "org:SwanseaUniversityMedical", type: REPOSITORY, first: 100, after: $cursor) {
+                pageInfo {
+                  hasNextPage
+                  endCursor
+                },
+                repos: edges {
+                  node {
+                    ... on Repository {
+                      name
+                      isPrivate
+                    }
+                  }
+                }
+              }
+            }`;
+
+            let cursor = null;
+            let hasNextPage = true;
+            const repositories = [];
+
+            while (hasNextPage) {
+              const response = await github.graphql(query, { cursor });
+              repositories.push(...response.search.repos.map(repo => repo.node.name));
+              hasNextPage = response.search.pageInfo.hasNextPage;
+              cursor = response.search.pageInfo.endCursor;
+            }
+
+            const repos = repositories.join(', '); // Return as a comma-separated string
+
+            const board = `query {
+                organization(login: "SwanseaUniversityMedical") {
+                  projectV2(number: 15) {
+                    id
+                  }
+                }
+              }`;
+            
+            const boardData = await github.graphql(board);
+            const boardID = boardData.organization.projectV2.id;
+
+            const PRQuery = `query PRs($cursor: String, $repo: String!) {
+              organization(login: "SwanseaUniversityMedical") {
+                repository(name: $repo) {
+                  pullRequests(first: 100, after: $cursor) {
+                    pageInfo {
+                      hasNextPage
+                      endCursor
+                    }
+                    PRs: edges {
+                      node {
+                        id                        
+                      }
+                    }
+                  }
+                }
+              }
+            }`;
+
+            const IssueQuery = `query Issues($cursor: String, $repo: String!) {
+              organization(login: "SwanseaUniversityMedical") {
+                repository(name: $repo) {
+                  issues(first: 100, after: $cursor) {
+                    pageInfo {
+                      hasNextPage
+                      endCursor
+                    }
+                    issues: edges {
+                      node {
+                        id                        
+                      }
+                  }
+                }
+              }
+            }`;
+
+            const addToBoard = `mutation AddToBoard($boardID: ID!, $ID: ID!) {
+              addProjectV2ItemById(input: {projectId: $boardID, contentId: $ID}) {
+                item {
+                  id
+                }
+              }
+            }`;
+                
+            for (let i = 0; i < repositories.length; i++) {
+              let cursor = null;
+              let hasNextPage = true;
+              const PRS = [];
+
+              while (hasNextPage) {
+                const response = await github.graphql(PRQuery, { cursor, repo: repositories[i] });
+                PRS.push(...response.organization.repository.pullRequests.PRs.map(pr => pr.node.id));
+                hasNextPage = response.organization.repository.pullRequests.pageInfo.hasNextPage;
+                cursor = response.organization.repository.pullRequests.pageInfo.endCursor;
+              }
+
+              for (let j = 0; j < PRS.length; j++) {
+                await github.graphql(addToBoard, { boardID, ID: PRS[j] });
+              }
+            }
+
+            for (let i = 0; i < repositories.length; i++) {
+              let cursor = null;
+              let hasNextPage = true;
+              const issues = [];
+
+              while (hasNextPage) {
+                const response = await github.graphql(IssueQuery, { cursor, repo: repositories[i] });
+                issues.push(...response.organization.repository.issues.issues.map(issue => issue.node.id));
+                hasNextPage = response.organization.repository.issues.pageInfo.hasNextPage;
+                cursor = response.organization.repository.issues.pageInfo.endCursor;
+              }
+
+              for (let j = 0; j < issues.length; j++) {
+                await github.graphql(addToBoard, { boardID, ID: issues[j] });
+              }
+            }
