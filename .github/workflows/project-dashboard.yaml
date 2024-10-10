@@ -87,7 +87,7 @@ jobs:
               }`;
             
               const boardData = await github.graphql(board);
-              console.log(boardData);
+              console.log(boardData.organization.projectV2.id);
 
               
             
