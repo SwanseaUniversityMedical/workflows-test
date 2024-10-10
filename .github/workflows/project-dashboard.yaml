@@ -20,7 +20,7 @@ jobs:
     steps:
 
       - uses: actions/github-script@v7
-        id: repos
+        id: dashboard-updater
         env:
           GITHUB_TOKEN: ${{ secrets.DASHBOARD_TEST_TOKEN }}
         with:
@@ -68,8 +68,7 @@ jobs:
               }`;
             
             const boardData = await github.graphql(board);
-            const boardID = boardData.organization.projectV2.id
-            console.log(boardID)
+            const boardID = boardData.organization.projectV2.id;
 
             const PRQuery = `query PRs($cursor: String, $repo: String!) {
               organization(login: "SwanseaUniversityMedical") {
