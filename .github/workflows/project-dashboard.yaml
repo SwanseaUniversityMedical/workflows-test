@@ -13,29 +13,10 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  get-board:
+  dashboard:
     runs-on:
       labels: [ self-hosted, linux, x64 ]
       group: light
-    steps:
-        - uses: octokit/graphql-action@v2.x
-          id: get_board
-          with:
-            query: |
-              query {
-                organization(login: "SwanseaUniversityMedical") {
-                  projectV2(number: 15) {
-                    id
-                  }
-                }
-              }
-          env:
-            GITHUB_TOKEN: ${{ secrets.DASHBOARD_TEST_TOKEN }}
-        - run: "echo 'board number: ${{ steps.get_board.outputs.data }}'"
-  get-repos:
-    runs-on:
-      labels: [ self-hosted, linux, x64 ]
-      group: heavy
     steps:
 
       - uses: actions/github-script@v7
