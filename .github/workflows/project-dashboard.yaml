@@ -46,6 +46,7 @@ jobs:
           result-encoding: string
           retries: 3
           retry-exempt-status-codes: 400,401
+          github-token: ${{ secrets.DASHBOARD_TEST_TOKEN }}
           script: |
             const query = `query Search($cursor: String) {
               search(query: "org:SwanseaUniversityMedical", type: REPOSITORY, first: 100, after: $cursor) {
