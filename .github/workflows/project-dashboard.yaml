@@ -67,9 +67,9 @@ jobs:
                 }
               }`;
             
-              const boardData = await github.graphql(board);
-              const boardID = boardData.organization.projectV2.id
-              console.log(boardID)
+            const boardData = await github.graphql(board);
+            const boardID = boardData.organization.projectV2.id
+            console.log(boardID)
 
             const PRQuery = `query PRs($cursor: String, $repo: String) {
               organization(login: "SwanseaUniversityMedical") {
@@ -97,21 +97,22 @@ jobs:
               }
             }`;
                 
-            for repo in repos:
+            for (let i = 0; i < repositories.length; i++) {
               let cursor = null;
               let hasNextPage = true;
               const issues = [];
 
               while (hasNextPage) {
-                const response = await github.graphql(PRQuery, { cursor }, { repo });
+                const response = await github.graphql(PRQuery, { cursor }, { repo: repositories[i] });
                 issues.push(...response.organization.repository.pullRequests.PRs.map(pr => pr.node.id));
                 hasNextPage = response.organization.repository.pullRequests.pageInfo.hasNextPage;
                 cursor = response.organization.repository.pullRequests.pageInfo.endCursor;
               }
-                
+
               for (let i = 0; i < issues.length; i++) {
                 await github.graphql(addToBoard, { boardID }, { issues[i] });
               }
+            }
 
               
             
