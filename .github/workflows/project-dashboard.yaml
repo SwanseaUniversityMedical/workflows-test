@@ -86,8 +86,8 @@ jobs:
                 }
               }`;
             
-              const boardId = await github.graphql(board).organization.projectV2.id;
-              console.log(`board id: ${boardId}`);
+              const boardData = await github.graphql(board);
+              console.log(boardData);
 
               
             
