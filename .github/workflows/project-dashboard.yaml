@@ -106,7 +106,7 @@ jobs:
             }`;
 
             const addToBoard = `mutation AddToBoard($boardID: ID!, $ID: ID!) {
-              addProjectV2ItemById(input: {projectId: $boardID, contentId: $PRID}) {
+              addProjectV2ItemById(input: {projectId: $boardID, contentId: $ID}) {
                 item {
                   id
                 }
