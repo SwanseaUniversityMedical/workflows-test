@@ -73,7 +73,7 @@ jobs:
             const PRQuery = `query PRs($cursor: String, $repo: String!) {
               organization(login: "SwanseaUniversityMedical") {
                 repository(name: $repo) {
-                  pullRequests(first: 100, after: $cursor, states: [OPEN]) {
+                  pullRequests(first: 100, after: $cursor) {
                     pageInfo {
                       hasNextPage
                       endCursor
@@ -88,7 +88,24 @@ jobs:
               }
             }`;
 
-            const addToBoard = `mutation AddToBoard($boardID: ID!, $PRID: ID!) {
+            const IssueQuery = `query Issues($cursor: String, $repo: String!) {
+              organization(login: "SwanseaUniversityMedical") {
+                repository(name: $repo) {
+                  issues(first: 100, after: $cursor) {
+                    pageInfo {
+                      hasNextPage
+                      endCursor
+                    }
+                    issues: edges {
+                      node {
+                        id                        
+                      }
+                  }
+                }
+              }
+            }`;
+
+            const addToBoard = `mutation AddToBoard($boardID: ID!, $ID: ID!) {
               addProjectV2ItemById(input: {projectId: $boardID, contentId: $PRID}) {
                 item {
                   id
@@ -99,16 +116,33 @@ jobs:
             for (let i = 0; i < repositories.length; i++) {
               let cursor = null;
               let hasNextPage = true;
-              const issues = [];
+              const PRS = [];
 
               while (hasNextPage) {
                 const response = await github.graphql(PRQuery, { cursor, repo: repositories[i] });
-                issues.push(...response.organization.repository.pullRequests.PRs.map(pr => pr.node.id));
+                PRS.push(...response.organization.repository.pullRequests.PRs.map(pr => pr.node.id));
                 hasNextPage = response.organization.repository.pullRequests.pageInfo.hasNextPage;
                 cursor = response.organization.repository.pullRequests.pageInfo.endCursor;
               }
 
+              for (let j = 0; j < PRS.length; j++) {
+                await github.graphql(addToBoard, { boardID, ID: PRS[j] });
+              }
+            }
+
+            for (let i = 0; i < repositories.length; i++) {
+              let cursor = null;
+              let hasNextPage = true;
+              const issues = [];
+
+              while (hasNextPage) {
+                const response = await github.graphql(IssueQuery, { cursor, repo: repositories[i] });
+                issues.push(...response.organization.repository.issues.issues.map(issue => issue.node.id));
+                hasNextPage = response.organization.repository.issues.pageInfo.hasNextPage;
+                cursor = response.organization.repository.issues.pageInfo.endCursor;
+              }
+
               for (let j = 0; j < issues.length; j++) {
-                await github.graphql(addToBoard, { boardID, PRID: issues[j] });
+                await github.graphql(addToBoard, { boardID, ID: issues[j] });
               }
             }
