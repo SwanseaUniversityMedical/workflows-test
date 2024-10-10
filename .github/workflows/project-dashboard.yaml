@@ -71,7 +71,7 @@ jobs:
             const boardID = boardData.organization.projectV2.id
             console.log(boardID)
 
-            const PRQuery = `query PRs($cursor: String, $repo: String) {
+            const PRQuery = `query PRs($cursor: String, $repo: String!) {
               organization(login: "SwanseaUniversityMedical") {
                 repository(name: $repo) {
                   pullRequests(first: 100, after: $cursor, states: [OPEN], author: "marvin-serp-bot") {
