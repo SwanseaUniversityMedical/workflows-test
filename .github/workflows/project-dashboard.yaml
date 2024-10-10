@@ -74,7 +74,7 @@ jobs:
             const PRQuery = `query PRs($cursor: String, $repo: String!) {
               organization(login: "SwanseaUniversityMedical") {
                 repository(name: $repo) {
-                  pullRequests(first: 100, after: $cursor, states: [OPEN] {
+                  pullRequests(first: 100, after: $cursor, states: [OPEN]) {
                     pageInfo {
                       hasNextPage
                       endCursor
@@ -90,7 +90,7 @@ jobs:
             }`;
 
             const addToBoard = `mutation AddToBoard($boardID: ID!, $PRID: ID!) {
-              addProjectV2ItemById(input: {projectId: "PROJECT_ID" contentId: "CONTENT_ID"}) {
+              addProjectV2ItemById(input: {projectId: $boardID, contentId: $PRID}) {
                 item {
                   id
                 }
