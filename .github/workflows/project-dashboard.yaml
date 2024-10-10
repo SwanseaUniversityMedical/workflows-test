@@ -103,13 +103,13 @@ jobs:
               const issues = [];
 
               while (hasNextPage) {
-                const response = await github.graphql(PRQuery, { cursor }, { repositories[i] });
+                const response = await github.graphql(PRQuery, { cursor, repo: repositories[i] });
                 issues.push(...response.organization.repository.pullRequests.PRs.map(pr => pr.node.id));
                 hasNextPage = response.organization.repository.pullRequests.pageInfo.hasNextPage;
                 cursor = response.organization.repository.pullRequests.pageInfo.endCursor;
               }
 
-              for (let i = 0; i < issues.length; i++) {
-                await github.graphql(addToBoard, { boardID }, { issues[i] });
+              for (let j = 0; j < issues.length; j++) {
+                await github.graphql(addToBoard, { boardID, PRID: issues[j] });
               }
             }
