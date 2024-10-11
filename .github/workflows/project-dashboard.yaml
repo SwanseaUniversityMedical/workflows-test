@@ -105,8 +105,6 @@ jobs:
               cursor = response.search.pageInfo.endCursor;
             }
 
-            const repos = repositories.join(', '); // Return as a comma-separated string
-
             const PRQuery = `query PRs($cursor: String, $repo: String!) {
               organization(login: "SwanseaUniversityMedical") {
                 repository(name: $repo) {
