@@ -29,6 +29,20 @@ jobs:
           retry-exempt-status-codes: 400,401
           github-token: ${{ secrets.DASHBOARD_TEST_TOKEN }}
           script: |
+            const rateLimitQuery = `query {
+              viewer {
+                login
+              }
+              rateLimit {
+                limit
+                remaining
+                used
+                resetAt
+              }
+            }`;
+            const rateLimit = await github.graphql(rateLimitQuery);
+            console.log(rateLimit.rateLimit.limit);
+            
             const clearQuery = `mutation ClearBoard($boardID: ID!, $itemID: ID!) {
               deleteProjectV2Item(input: {projectId: $boardID, itemId: $itemID}) {
                 deletedItemId
@@ -182,16 +196,3 @@ jobs:
                 await github.graphql(addToBoard, { boardID, ID: issues[j] });
               }
             }
-            const rateLimitQuery = `query {
-              viewer {
-                login
-              }
-              rateLimit {
-                limit
-                remaining
-                used
-                resetAt
-              }
-            }`;
-            const rateLimit = await github.graphql(rateLimitQuery);
-            console.log(rateLimit.rateLimit.used);
