@@ -93,8 +93,8 @@ jobs:
               }
             }`;
 
-            let cursor = null;
-            let hasNextPage = true;
+            cursor = null;
+            hasNextPage = true;
             const repositories = [];
 
             while (hasNextPage) {
