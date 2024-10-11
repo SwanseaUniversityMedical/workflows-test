@@ -128,7 +128,7 @@ jobs:
             const IssueQuery = `query Issues($cursor: String, $repo: String!) {
               organization(login: "SwanseaUniversityMedical") {
                 repository(name: $repo) {
-                  issues(first: 100, after: $cursor) {
+                  issues(first: 100, after: $cursor, states: [OPEN]) {
                     pageInfo {
                       hasNextPage
                       endCursor
