@@ -63,17 +63,17 @@ jobs:
             
             let cursor = null;
             let hasNextPage = true;
-            const boardData = [];
+            const boardItems = [];
 
             while (hasNextPage) {
               const response = await github.graphql(getProjectData, { boardID, cursor });
-              boardData.push(...response.node.items.items.map(item => item.node.id));
+              boardItems.push(...response.node.items.items.map(item => item.node.id));
               hasNextPage = response.node.items.pageInfo.hasNextPage;
               cursor = response.node.items.pageInfo.endCursor;
             }
             
-            for (let i = 0; i < boardData.length; i++) {
-                await github.graphql(clearQuery, { boardID, itemID: boardData[i] });
+            for (let i = 0; i < boardItems.length; i++) {
+                await github.graphql(clearQuery, { boardID, itemID: boardItems[i] });
               }
                 
             const query = `query Search($cursor: String) {
