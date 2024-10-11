@@ -29,6 +29,53 @@ jobs:
           retry-exempt-status-codes: 400,401
           github-token: ${{ secrets.DASHBOARD_TEST_TOKEN }}
           script: |
+            const clearQuery = `mutation ClearBoard($boardID: ID!, $itemID: ID!) {
+              deleteProjectV2Item(input: {projectId: $boardID, itemId: $itemID}) {
+                deletedItemId
+              }
+            }`;
+
+            const getProjectData = `query GetProjectData($boardID: ID!, $cursor: String){node(id: $boardID) {
+              ... on ProjectV2 {
+                items(first: 100, after: $cursor) {
+                  pageInfo {
+                    hasNextPage
+                    endCursor
+                  }
+                  items: edges {
+                    node {
+                      id
+                    }
+                  }
+                }
+              }`;
+
+            const board = `query {
+                organization(login: "SwanseaUniversityMedical") {
+                  projectV2(number: 15) {
+                    id
+                  }
+                }
+              }`;
+            
+            const boardData = await github.graphql(board);
+            const boardID = boardData.organization.projectV2.id;
+            
+            let cursor = null;
+            let hasNextPage = true;
+            const boardData = [];
+
+            while (hasNextPage) {
+              const response = await github.graphql(getProjectData, { boardID, cursor });
+              boardData.push(...response.node.items.items.map(item => item.node.id));
+              hasNextPage = response.node.items.pageInfo.hasNextPage;
+              cursor = response.node.items.pageInfo.endCursor;
+            }
+            
+            for (let i = 0; i < boardData.length; i++) {
+                await github.graphql(clearQuery, { boardID, itemID: boardData[i] });
+              }
+                
             const query = `query Search($cursor: String) {
               search(query: "org:SwanseaUniversityMedical", type: REPOSITORY, first: 100, after: $cursor) {
                 pageInfo {
@@ -58,17 +105,6 @@ jobs:
             }
 
             const repos = repositories.join(', '); // Return as a comma-separated string
-
-            const board = `query {
-                organization(login: "SwanseaUniversityMedical") {
-                  projectV2(number: 15) {
-                    id
-                  }
-                }
-              }`;
-            
-            const boardData = await github.graphql(board);
-            const boardID = boardData.organization.projectV2.id;
 
             const PRQuery = `query PRs($cursor: String, $repo: String!) {
               organization(login: "SwanseaUniversityMedical") {
