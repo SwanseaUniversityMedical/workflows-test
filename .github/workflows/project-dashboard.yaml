@@ -182,3 +182,16 @@ jobs:
                 await github.graphql(addToBoard, { boardID, ID: issues[j] });
               }
             }
+            const rateLimitQuery = `query {
+              viewer {
+                login
+              }
+              rateLimit {
+                limit
+                remaining
+                used
+                resetAt
+              }
+            }`;
+            const rateLimit = await github.graphql(rateLimitQuery);
+            console.log(rateLimit.rateLimit.used);
