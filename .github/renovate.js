@@ -5,7 +5,7 @@ module.exports = {
   //dryRun: "full",
 
   // Inherit default config options
-  extends: ["config:base"],
+  //extends: ["config:base"],
   configMigration: true,
 
   // Force use of Conventional Commit messages to avoid Renovate not detecting them
@@ -52,7 +52,7 @@ module.exports = {
       matchPackageNames: ["SwanseaUniversityMedical/workflows"],
       matchUpdateTypes: ["minor", "patch"]
     }
-  ]
+  ],
 
   // Rest of the config goes here...
   hostRules: [
