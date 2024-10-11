@@ -109,7 +109,7 @@ jobs:
             const PRQuery = `query PRs($cursor: String, $repo: String!) {
               organization(login: "SwanseaUniversityMedical") {
                 repository(name: $repo) {
-                  pullRequests(first: 100, after: $cursor) {
+                  pullRequests(first: 100, after: $cursor, states: [OPEN]) {
                     pageInfo {
                       hasNextPage
                       endCursor
