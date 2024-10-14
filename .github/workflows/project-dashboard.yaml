@@ -29,12 +29,14 @@ jobs:
           retry-exempt-status-codes: 400,401
           github-token: ${{ secrets.DASHBOARD_TEST_TOKEN }}
           script: |
+            // This query deletes an item from the project board
             const clearQuery = `mutation ClearBoard($boardID: ID!, $itemID: ID!) {
               deleteProjectV2Item(input: {projectId: $boardID, itemId: $itemID}) {
                 deletedItemId
               }
             }`;
 
+            // This query gets a list of items on the project board
             const getProjectData = `query GetProjectData($boardID: ID!, $cursor: String){node(id: $boardID) {
               ... on ProjectV2 {
                 items(first: 100, after: $cursor) {
@@ -51,6 +53,7 @@ jobs:
               }
             }}`;
 
+            // This query gets the ID of the project board
             const board = `query {
                 organization(login: "SwanseaUniversityMedical") {
                   projectV2(number: 15) {
@@ -62,6 +65,7 @@ jobs:
             const boardData = await github.graphql(board);
             const boardID = boardData.organization.projectV2.id;
             
+            // Clear the contents of the project board
             let cursor = null;
             let hasNextPage = true;
             const boardItems = [];
@@ -76,7 +80,9 @@ jobs:
             for (let i = 0; i < boardItems.length; i++) {
                 await github.graphql(clearQuery, { boardID, itemID: boardItems[i] });
               }
-                
+   
+
+            // This query gets a list of repositories in the organization
             const query = `query Search($cursor: String) {
               search(query: "org:SwanseaUniversityMedical", type: REPOSITORY, first: 100, after: $cursor) {
                 pageInfo {
@@ -94,6 +100,7 @@ jobs:
               }
             }`;
 
+            // Build a list of repositories for the organization
             cursor = null;
             hasNextPage = true;
             const repositories = [];
@@ -105,6 +112,7 @@ jobs:
               cursor = response.search.pageInfo.endCursor;
             }
 
+            // This query gets a list of PRs in the organization
             const PRQuery = `query PRs($cursor: String, $repo: String!) {
               organization(login: "SwanseaUniversityMedical") {
                 repository(name: $repo) {
@@ -123,6 +131,7 @@ jobs:
               }
             }`;
 
+            // This query gets a list of issues in the organization
             const IssueQuery = `query Issues($cursor: String, $repo: String!) {
               organization(login: "SwanseaUniversityMedical") {
                 repository(name: $repo) {
@@ -141,6 +150,7 @@ jobs:
               }
             }`;
 
+            // This mutation adds an item to the project board
             const addToBoard = `mutation AddToBoard($boardID: ID!, $ID: ID!) {
               addProjectV2ItemById(input: {projectId: $boardID, contentId: $ID}) {
                 item {
@@ -149,6 +159,7 @@ jobs:
               }
             }`;
                 
+            // Get all PRs and then add them to the project board
             for (let i = 0; i < repositories.length; i++) {
               let cursor = null;
               let hasNextPage = true;
@@ -166,6 +177,7 @@ jobs:
               }
             }
 
+            // Get all issues and then add them to the project board
             for (let i = 0; i < repositories.length; i++) {
               let cursor = null;
               let hasNextPage = true;
