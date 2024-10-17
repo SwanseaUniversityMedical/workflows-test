@@ -47,10 +47,25 @@ module.exports = {
 
   packageRules: [
     {
+      groupName: "all non-major dependencies",
+      groupSlug: "all-minor-patch",
+      matchPackageNames: ["*"],
+      matchUpdateTypes: ["minor", "patch"]
+    },
+    {
       groupName: "workflows non-major dependencies",
       groupSlug: "workflows-minor-patch",
       matchPackageNames: ["SwanseaUniversityMedical/workflows"],
       matchUpdateTypes: ["minor", "patch"]
+    },
+    {
+      matchUpdateTypes: ["major"],
+      dependencyDashboardApproval: true
+    },
+    {
+      matchPackageNames: ["SwanseaUniversityMedical/workflows"],
+      matchUpdateTypes: ["major"],
+      dependencyDashboardApproval: false
     }
   ],
 
