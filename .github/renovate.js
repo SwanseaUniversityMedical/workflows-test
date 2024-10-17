@@ -2,7 +2,7 @@ module.exports = {
 
   // Uncomment dryRun to test exotic config options without spamming dozens of
   // pull requests onto a repo that you would then need to clean up...
-  dryRun: "full",
+  // dryRun: "full",
 
   // Inherit default config options
   //extends: ["config:base"],
@@ -47,10 +47,25 @@ module.exports = {
 
   packageRules: [
     {
+      groupName: "all non-major dependencies",
+      groupSlug: "all-minor-patch",
+      matchPackageNames: ["*"],
+      matchUpdateTypes: ["minor", "patch"]
+    },
+    {
+      matchUpdateTypes: ["major"],
+      dependencyDashboardApproval: true
+    },
+    {
       groupName: "workflows non-major dependencies",
       groupSlug: "workflows-minor-patch",
       matchPackageNames: ["SwanseaUniversityMedical/workflows"],
       matchUpdateTypes: ["minor", "patch"]
+    },
+    {
+      matchPackageNames: ["SwanseaUniversityMedical/workflows"],
+      matchUpdateTypes: ["major"],
+      dependencyDashboardApproval: false
     }
   ],
 
