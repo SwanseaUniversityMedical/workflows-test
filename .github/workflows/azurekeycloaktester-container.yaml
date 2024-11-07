@@ -1,0 +1,48 @@
+name: Build AzureKeycloakTester Container
+
+on:
+  pull_request:
+    # Only consider PRs that change files for this asset, including ci scripts
+    paths:
+      - '.github/workflows/azurekeycloaktester-container.yaml'
+      - 'containers/AzureKeycloakTester/**'
+  push:
+    # Only release off of release and maintenance branches for this asset
+    branches:
+      - 'main'
+    # Only consider pushes that change files for this asset, including ci scripts
+    paths:
+      - '.github/workflows/azurekeycloaktester-container.yaml'
+      - 'containers/AzureKeycloakTester/**'
+
+permissions:
+  contents: write
+  pull-requests: write
+  actions: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  # Cancel early on pull requests if new commits are added,
+  # Don't cancel on release pushes
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  # Job name must be unique across repo to target
+  # branch protection rules "required checks" properly!
+  azurekeycloaktester-container:
+    uses: SwanseaUniversityMedical/workflows/.github/workflows/pr-and-release-container.yaml@feat/runs-on-input
+    with:
+      job-name: azurekeycloaktester-container
+      comment-pr: "true"
+      comment-release: "true"
+      registry: ${{ vars.HARBOR_REGISTRY }}
+      registry-user: ${{ vars.HARBOR_USER }}
+      registry-repo: ${{ vars.HARBOR_PROJECT }}/azurekeycloaktester
+      release-tag-format: 'v${version}-azurekeycloaktester-container'
+      cosign-public-key: ${{ vars.COSIGN_PUBLIC_KEY }}
+      build-file: containers/AzureKeycloakTester/Dockerfile
+      build-context: containers
+    secrets:
+      cosign-private-key: ${{ secrets.COSIGN_PRIVATE_KEY }}
+      cosign-password: ${{ secrets.COSIGN_PASSWORD }}
+      registry-token: ${{ secrets.HARBOR_TOKEN }}
