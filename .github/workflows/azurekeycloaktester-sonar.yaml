@@ -25,7 +25,7 @@ jobs:
   azurekeycloaktester-sonar:
     uses: SwanseaUniversityMedical/workflows/.github/workflows/sonar-dotnet.yaml@feat/sonar-workflow
     with:
-      project-name: "AzureKeycloakTester"
+      project-name: "workflows-test-azurekeycloaktester"
       project-file: "AzureKeycloakTester.csproj"
       project-context: "containers/AzureKeycloakTester"
       sonar-url: ${{ vars.SONAR_URL }}
