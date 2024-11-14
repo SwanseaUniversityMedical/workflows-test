@@ -28,6 +28,6 @@ jobs:
       project-name: "workflows-test-azurekeycloaktester"
       project-file: "AzureKeycloakTester.csproj"
       project-context: "containers/AzureKeycloakTester"
-      sonar-url: ${{ vars.SONAR_URL }}
+      sonar-url: ${{ vars.SONAR_PROD_URL }}
     secrets:
-      sonar-token: ${{ secrets.SONAR_TOKEN }}
+      sonar-token: ${{ secrets.SONAR_PROD_TOKEN }}
