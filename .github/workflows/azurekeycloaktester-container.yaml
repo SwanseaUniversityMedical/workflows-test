@@ -10,7 +10,7 @@ on:
     # Only release off of release and maintenance branches for this asset
     branches:
       - 'main'
-    # Only consider pushes that change files for this asset, including ci scripts.
+    # Only consider pushes that change files for this asset, including ci scripts
     paths:
       - '.github/workflows/azurekeycloaktester-container.yaml'
       - 'containers/AzureKeycloakTester/**'
