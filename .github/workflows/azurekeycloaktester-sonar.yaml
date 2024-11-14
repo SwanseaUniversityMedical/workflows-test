@@ -7,13 +7,9 @@ on:
       - '.github/workflows/azurekeycloaktester-sonar.yaml'
       - 'containers/AzureKeycloakTester/**'
   push:
-    # Only release off of release and maintenance branches for this asset
-    branches:
-      - 'main'
-    # Only consider pushes that change files for this asset, including ci scripts
-    paths:
-      - '.github/workflows/azurekeycloaktester-sonar.yaml'
-      - 'containers/AzureKeycloakTester/**'
+    # Only trigger off of relevant release tags
+    tags:
+      - 'v*.*.*-azurekeycloaktester-container'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
