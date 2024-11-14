@@ -1,0 +1,33 @@
+name: Scan AzureKeycloakTester
+
+on:
+  pull_request:
+    # Only consider PRs that change files for this asset, including ci scripts
+    paths:
+      - '.github/workflows/azurekeycloaktester-sonar.yaml'
+      - 'containers/AzureKeycloakTester/**'
+  push:
+    # Only release off of release and maintenance branches for this asset
+    branches:
+      - 'main'
+    # Only consider pushes that change files for this asset, including ci scripts
+    paths:
+      - '.github/workflows/azurekeycloaktester-sonar.yaml'
+      - 'containers/AzureKeycloakTester/**'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  # Cancel early on pull requests if new commits are added,
+  # Don't cancel on release pushes..
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  azurekeycloaktester-sonar:
+    uses: SwanseaUniversityMedical/workflows/.github/workflows/sonar-dotnet.yaml@feat/sonar-version
+    with:
+      project-name: "workflows-test-azurekeycloaktester"
+      project-file: "AzureKeycloakTester.csproj"
+      project-context: "containers/AzureKeycloakTester"
+      sonar-url: ${{ vars.SONAR_URL }}
+    secrets:
+      sonar-token: ${{ secrets.SONAR_TOKEN }}

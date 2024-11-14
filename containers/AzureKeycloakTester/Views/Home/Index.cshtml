@@ -1,0 +1,27 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+}
+
+<div class="text-center">
+    <h1 class="display-4">Welcome</h1>
+    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+    
+        @if (!User.Identity.IsAuthenticated)
+        { <p>
+            Not logged in
+          </p>
+        }
+        else if (User.Identities.FirstOrDefault() != null && User.Identities.First().Claims.FirstOrDefault(x => x.Type == "preferred_username") != null)
+        {
+            <p>
+                User is @User.Identities.First().Claims.First(x => x.Type == "preferred_username").Value
+            </p>
+        }
+        else
+        {
+        <p>
+            User is logged in. Name unknown
+        </p>
+        }
+    
+</div>
