@@ -19,7 +19,7 @@ jobs:
       group: heavy
 
     steps:
-      - uses: SwanseaUniversityMedical/workflows/.github/actions/renovate@v1.0.3-renovate
+      - uses: SwanseaUniversityMedical/workflows/.github/actions/renovate@v1.0.4-renovate
         with:
           token: ${{ secrets.RENOVATE_TOKEN }}
         env:
