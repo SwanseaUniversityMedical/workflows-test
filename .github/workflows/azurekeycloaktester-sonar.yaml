@@ -23,7 +23,7 @@ concurrency:
 
 jobs:
   azurekeycloaktester-sonar:
-    uses: SwanseaUniversityMedical/workflows/.github/workflows/sonar-dotnet.yaml@feat/upgrade-sonar-dotnet-container
+    uses: SwanseaUniversityMedical/workflows/.github/workflows/sonar-dotnet.yaml@v2.0.0-sonar-dotnet
     with:
       project-name: "workflows-test-azurekeycloaktester"
       project-file: "AzureKeycloakTester.csproj"
