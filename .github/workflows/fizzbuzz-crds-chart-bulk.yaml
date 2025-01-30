@@ -1,0 +1,70 @@
+name: Build Fizzbuzz CRDs Chart
+
+on:
+  pull_request:
+    # Ignore PRs on branches specifically intended for other assets
+    branches-ignore:
+      - '*/controller-container*'
+      - '*/trino-container*'
+      - '*/fizzbuzz-chart*'
+    # Only consider PRs that change files for this asset, including ci scripts
+    paths:
+      - '.github/workflows/fizzbuzz-crds-chart-bulk.yaml'
+      - 'charts/fizzbuzz-crds-bulk/**'
+    # Make sure all workflows that are "required checks" for a given
+    # branch protection rule have the same paths: and branches-ignore:
+    # filters. Otherwise, you can end up in a deadlock waiting on a
+    # required check that will never be executed.
+  push:
+    # Only release off of release and maintenance branches for this asset
+    branches:
+      - 'maintenance/fizzbuzz-crds-chart-bulk/[0-9]+.x.x'
+      - 'maintenance/fizzbuzz-crds-chart-bulk/[0-9]+.[0-9]+.x'
+      - 'main'
+    # Only consider pushes that change files for this asset, including ci scripts
+    paths:
+      - '.github/workflows/fizzbuzz-crds-chart-bulk.yaml'
+      - 'charts/fizzbuzz-crds-bulk/**'
+
+permissions:
+  contents: write
+  pull-requests: write
+  actions: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  # Cancel early on pull requests if new commits are added,
+  # Don't cancel on release pushes
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  # Job name must be unique across repo to target
+  # branch protection rules "required checks" properly!
+
+  bulk-fizzbuzz-test:
+    uses: SwanseaUniversityMedical/workflows/.github/workflows/pr-and-release-repo.yaml@v1.0.0-repo
+    with:
+      job-name: bulk-fizzbuzz-test
+      release-tag-format: 'v${version}-bulk-fizzbuzz-test'
+
+  fizzbuzz-crds-chart-bulk:
+    needs: bulk-fizzbuzz-test
+    uses: SwanseaUniversityMedical/workflows/.github/workflows/bulk-pr-and-release-chart.yaml@v1.0.1-bulk-charts
+    with:
+      job-name: fizzbuzz-crds-chart
+      comment-pr: "true"
+      comment-release: "true"
+      registry: ${{ vars.HARBOR_REGISTRY }}
+      registry-user: ${{ vars.HARBOR_USER }}
+      registry-project: ${{ vars.HARBOR_PROJECT }}
+      registry-repo: fizzbuzz-crds
+      release-info: ${{ needs.bulk-fizzbuzz-test.outputs.release-info }}
+      cosign-public-key: ${{ vars.COSIGN_PUBLIC_KEY }}
+      chart: charts/fizzbuzz-crds
+      test-command: |
+        helm template $CHART --debug
+
+    secrets:
+      cosign-private-key: ${{ secrets.COSIGN_PRIVATE_KEY }}
+      cosign-password: ${{ secrets.COSIGN_PASSWORD }}
+      registry-token: ${{ secrets.HARBOR_TOKEN }}
