@@ -42,14 +42,14 @@ jobs:
   # branch protection rules "required checks" properly!
 
   bulk-fizzbuzz-test:
-    uses: SwanseaUniversityMedical/workflows/.github/workflows/pr-and-release-repo.yaml@v1.0.0-repo
+    uses: SwanseaUniversityMedical/workflows/.github/workflows/pr-and-release-repo.yaml@fix/charts-and-containers-are-outputting-blank-comments
     with:
       job-name: bulk-fizzbuzz-test
       release-tag-format: 'v${version}-bulk-fizzbuzz-test'
 
   fizzbuzz-crds-chart-bulk:
     needs: bulk-fizzbuzz-test
-    uses: SwanseaUniversityMedical/workflows/.github/workflows/bulk-pr-and-release-chart.yaml@v1.0.1-bulk-charts
+    uses: SwanseaUniversityMedical/workflows/.github/workflows/bulk-pr-and-release-chart.yaml@fix/charts-and-containers-are-outputting-blank-comments
     with:
       job-name: fizzbuzz-crds-chart
       comment-pr: "true"
