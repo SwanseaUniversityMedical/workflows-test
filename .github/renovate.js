@@ -1,5 +1,8 @@
 module.exports = {
 
+  baseDir: "/tmp/renovate",
+  cacheDir: "/tmp/renovate/cache",
+
   // Uncomment dryRun to test exotic config options without spamming dozens of
   // pull requests onto a repo that you would then need to clean up...
   // dryRun: "full",
