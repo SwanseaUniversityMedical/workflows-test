@@ -6,7 +6,7 @@ on:
     paths:
       - '.github/workflows/flake8.yaml'
       - '.github/workflows/multi-container-test.yaml'
-      - 'containers/controller/**'
+      - 'containers/bulk-controller/**'
       - 'containers/trino/**'
       - 'charts/fizzbuzz/**'
     # Make sure all workflows that are "required checks" for a given
