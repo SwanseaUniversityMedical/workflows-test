@@ -20,7 +20,7 @@ on:
     # Only consider pushes that change files for this asset, including ci scripts
     paths:
       - '.github/workflows/multi-container-test.yaml'
-      - 'containers/controller/**'
+      - 'containers/bulk-controller/**'
       - 'containers/trino/**'
       - 'charts/fizzbuzz/**'
 
@@ -44,11 +44,11 @@ jobs:
       job-name: setup
       release-tag-format: 'v${version}-bulk-release-test'
 
-  controller-container:
+  bulk-controller-container:
     needs: setup
     uses: SwanseaUniversityMedical/workflows/.github/workflows/bulk-pr-and-release-container.yaml@refactor/build-cache-uses-pr-number
     with:
-      job-name: controller-container
+      job-name: bulk-controller-container
       comment-pr: "true"
       comment-release: "true"
       registry: ${{ vars.HARBOR_REGISTRY }}
@@ -56,8 +56,8 @@ jobs:
       registry-repo: ${{ vars.HARBOR_PROJECT }}/controller
       release-info: ${{ needs.setup.outputs.release-info }}
       cosign-public-key: ${{ vars.COSIGN_PUBLIC_KEY }}
-      build-file: containers/controller/Dockerfile
-      build-context: containers/controller
+      build-file: containers/bulk-controller/Dockerfile
+      build-context: containers/bulk-controller
     secrets:
       cosign-private-key: ${{ secrets.COSIGN_PRIVATE_KEY }}
       cosign-password: ${{ secrets.COSIGN_PASSWORD }}
