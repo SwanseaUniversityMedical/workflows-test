@@ -65,7 +65,7 @@ jobs:
 
   trino-container:
     needs: setup
-    uses: SwanseaUniversityMedical/workflows/.github/workflows/bulk-pr-and-release-container.yamlrefactor/build-cache-uses-pr-number
+    uses: SwanseaUniversityMedical/workflows/.github/workflows/bulk-pr-and-release-container.yaml@refactor/build-cache-uses-pr-number
     with:
       job-name: trino-container
       comment-pr: "true"
