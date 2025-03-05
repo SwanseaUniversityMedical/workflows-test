@@ -1,4 +1,4 @@
-name: Bulk Container Matrix
+name: Bulk Container
 
 on:
   pull_request:
@@ -35,7 +35,7 @@ jobs:
     uses: SwanseaUniversityMedical/workflows/.github/workflows/pr-and-release-repo.yaml@refactor/actions
     with:
       job-name: bulk-container-matrix
-      release-tag-format: 'v${version}-bulk-container-matrix'
+      release-tag-format: 'v${version}-bulk-container'
 
   bulk-container:
     needs: repo
@@ -53,6 +53,7 @@ jobs:
             registry-repo: ${{ vars.HARBOR_PROJECT }}/bulk-trino
             build-file: containers/trino/Dockerfile
             build-context: containers/trino
+    name: ${{ matrix.job-name }}
     with:
       job-name: ${{ matrix.job-name }}
       comment-pr: "true"

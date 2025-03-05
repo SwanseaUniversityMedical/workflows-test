@@ -1,4 +1,4 @@
-name: Bulk Chart Matrix
+name: Bulk Chart
 
 on:
   pull_request:
@@ -36,7 +36,7 @@ jobs:
     uses: SwanseaUniversityMedical/workflows/.github/workflows/pr-and-release-repo.yaml@refactor/actions
     with:
       job-name: bulk-chart-matrix
-      release-tag-format: 'v${version}-bulk-chart-matrix'
+      release-tag-format: 'v${version}-bulk-chart'
 
   bulk-chart:
     needs: repo
@@ -52,6 +52,7 @@ jobs:
           - job-name: bulk-fizzbuzz-crds-chart
             registry-repo: bulk-fizzbuzz-crds
             chart: charts/bulk-fizzbuzz-crds
+    name: ${{ matrix.job-name }}
     with:
       job-name: ${{ matrix.job-name }}
       comment-pr: "true"
