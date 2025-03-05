@@ -1,25 +1,14 @@
-name: Build Fizzbuzz CRDs Chart
+name: Fizzbuzz CRDs Chart
 
 on:
   pull_request:
-    # Ignore PRs on branches specifically intended for other assets
-    branches-ignore:
-      - '*/controller-container*'
-      - '*/trino-container*'
-      - '*/fizzbuzz-chart*'
     # Only consider PRs that change files for this asset, including ci scripts
     paths:
       - '.github/workflows/fizzbuzz-crds-chart.yaml'
       - 'charts/fizzbuzz-crds/**'
-    # Make sure all workflows that are "required checks" for a given
-    # branch protection rule have the same paths: and branches-ignore:
-    # filters. Otherwise, you can end up in a deadlock waiting on a
-    # required check that will never be executed.
   push:
     # Only release off of release and maintenance branches for this asset
     branches:
-      - 'maintenance/fizzbuzz-crds-chart/[0-9]+.x.x'
-      - 'maintenance/fizzbuzz-crds-chart/[0-9]+.[0-9]+.x'
       - 'main'
     # Only consider pushes that change files for this asset, including ci scripts
     paths:
@@ -41,7 +30,7 @@ jobs:
   # Job name must be unique across repo to target
   # branch protection rules "required checks" properly!
   fizzbuzz-crds-chart:
-    uses: SwanseaUniversityMedical/workflows/.github/workflows/pr-and-release-chart.yaml@fix/charts-and-containers-are-outputting-blank-comments
+    uses: SwanseaUniversityMedical/workflows/.github/workflows/pr-and-release-chart.yaml@v2.0.7-charts
     with:
       job-name: fizzbuzz-crds-chart
       comment-pr: "true"
