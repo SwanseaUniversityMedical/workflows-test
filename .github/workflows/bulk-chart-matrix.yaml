@@ -47,11 +47,11 @@ jobs:
         include:
           - job-name: bulk-fizzbuzz-chart
             registry-repo: bulk-fizzbuzz
-            chart: charts/fizzbuzz
+            chart: charts/bulk-fizzbuzz
 
           - job-name: bulk-fizzbuzz-crds-chart
             registry-repo: bulk-fizzbuzz-crds
-            chart: charts/fizzbuzz-crds
+            chart: charts/bulk-fizzbuzz-crds
     with:
       job-name: ${{ matrix.job-name }}
       comment-pr: "true"

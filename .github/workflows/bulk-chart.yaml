@@ -51,7 +51,7 @@ jobs:
       registry-repo: bulk-fizzbuzz
       release-info: ${{ needs.repo.outputs.release-info }}
       cosign-public-key: ${{ vars.COSIGN_PUBLIC_KEY }}
-      chart: charts/fizzbuzz
+      chart: charts/bulk-fizzbuzz
       test-command: |
         helm template $CHART --debug
 
@@ -73,7 +73,7 @@ jobs:
       registry-repo: bulk-fizzbuzz-crds
       release-info: ${{ needs.repo.outputs.release-info }}
       cosign-public-key: ${{ vars.COSIGN_PUBLIC_KEY }}
-      chart: charts/fizzbuzz-crds
+      chart: charts/bulk-fizzbuzz-crds
       test-command: |
         helm template $CHART --debug
 
