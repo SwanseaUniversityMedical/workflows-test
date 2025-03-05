@@ -37,16 +37,17 @@ jobs:
       job-name: bulk-container-matrix
       release-tag-format: 'v${version}-bulk-container-matrix'
 
-  bulk-controller-container:
+  bulk-container:
     needs: repo
     uses: SwanseaUniversityMedical/workflows/.github/workflows/bulk-pr-and-release-container.yaml@refactor/actions
     strategy:
+      fail-fast: false
       matrix:
         include:
           - job-name: bulk-controller-container
             registry-repo: ${{ vars.HARBOR_PROJECT }}/bulk-controller
-            build-file: containers/bulk-controller/Dockerfile
-            build-context: containers/bulk-controller
+            build-file: containers/controller/Dockerfile
+            build-context: containers/controller
 
           - job-name: bulk-trino-container
             registry-repo: ${{ vars.HARBOR_PROJECT }}/bulk-trino

@@ -42,6 +42,7 @@ jobs:
     needs: repo
     uses: SwanseaUniversityMedical/workflows/.github/workflows/bulk-pr-and-release-chart.yaml@refactor/actions
     strategy:
+      fail-fast: false
       matrix:
         include:
           - job-name: bulk-fizzbuzz-chart
