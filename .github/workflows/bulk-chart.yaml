@@ -1,0 +1,83 @@
+name: Bulk Chart
+
+on:
+  pull_request:
+    # Only consider PRs that change files for this asset, including ci scripts
+    paths:
+      - '.github/workflows/bulk-chart.yaml'
+      - 'charts/fizzbuzz/**'
+      - 'charts/fizzbuzz-crds/**'
+  push:
+    # Only release off of release and maintenance branches for this asset
+    branches:
+      - 'main'
+    # Only consider pushes that change files for this asset, including ci scripts
+    paths:
+      - '.github/workflows/bulk-chart.yaml'
+      - 'charts/fizzbuzz/**'
+      - 'charts/fizzbuzz-crds/**'
+
+permissions:
+  contents: write
+  pull-requests: write
+  actions: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  # Cancel early on pull requests if new commits are added,
+  # Don't cancel on release pushes
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  # Job name must be unique across repo to target
+  # branch protection rules "required checks" properly!
+
+  repo:
+    uses: SwanseaUniversityMedical/workflows/.github/workflows/pr-and-release-repo.yaml@refactor/actions
+    with:
+      job-name: bulk-chart
+      release-tag-format: 'v${version}-bulk-chart'
+
+  bulk-fizzbuzz-chart:
+    needs: repo
+    uses: SwanseaUniversityMedical/workflows/.github/workflows/bulk-pr-and-release-chart.yaml@refactor/actions
+    with:
+      job-name: bulk-fizzbuzz-chart
+      comment-pr: "true"
+      comment-release: "true"
+      registry: ${{ vars.HARBOR_REGISTRY }}
+      registry-user: ${{ vars.HARBOR_USER }}
+      registry-project: ${{ vars.HARBOR_PROJECT }}
+      registry-repo: bulk-fizzbuzz
+      release-info: ${{ needs.repo.outputs.release-info }}
+      cosign-public-key: ${{ vars.COSIGN_PUBLIC_KEY }}
+      chart: charts/fizzbuzz
+      test-command: |
+        helm template $CHART --debug
+
+    secrets:
+      cosign-private-key: ${{ secrets.COSIGN_PRIVATE_KEY }}
+      cosign-password: ${{ secrets.COSIGN_PASSWORD }}
+      registry-token: ${{ secrets.HARBOR_TOKEN }}
+
+  bulk-fizzbuzz-crds-chart:
+    needs: repo
+    uses: SwanseaUniversityMedical/workflows/.github/workflows/bulk-pr-and-release-chart.yaml@refactor/actions
+    with:
+      job-name: bulk-fizzbuzz-crds-chart
+      comment-pr: "true"
+      comment-release: "true"
+      registry: ${{ vars.HARBOR_REGISTRY }}
+      registry-user: ${{ vars.HARBOR_USER }}
+      registry-project: ${{ vars.HARBOR_PROJECT }}
+      registry-repo: bulk-fizzbuzz-crds
+      release-info: ${{ needs.repo.outputs.release-info }}
+      cosign-public-key: ${{ vars.COSIGN_PUBLIC_KEY }}
+      chart: charts/fizzbuzz-crds
+      test-command: |
+        helm template $CHART --debug
+
+    secrets:
+      cosign-private-key: ${{ secrets.COSIGN_PRIVATE_KEY }}
+      cosign-password: ${{ secrets.COSIGN_PASSWORD }}
+      registry-token: ${{ secrets.HARBOR_TOKEN }}

@@ -1,4 +1,4 @@
-name: Scan AzureKeycloakTester
+name: AzureKeycloakTester Sonar
 
 on:
   pull_request:
@@ -23,7 +23,7 @@ concurrency:
 
 jobs:
   azurekeycloaktester-sonar:
-    uses: SwanseaUniversityMedical/workflows/.github/workflows/sonar-dotnet.yaml@v2.0.0-sonar-dotnet
+    uses: SwanseaUniversityMedical/workflows/.github/workflows/sonar-dotnet-7.yaml@refactor/actions
     with:
       project-name: "workflows-test-azurekeycloaktester"
       project-file: "AzureKeycloakTester.csproj"

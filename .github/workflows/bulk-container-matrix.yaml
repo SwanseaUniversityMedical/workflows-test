@@ -1,0 +1,69 @@
+name: Bulk Container Matrix
+
+on:
+  pull_request:
+    # Only consider PRs that change files for this asset, including ci scripts
+    paths:
+      - '.github/workflows/bulk-container.yaml'
+      - 'containers/controller/**'
+      - 'containers/trino/**'
+  push:
+    # Only release off of release and maintenance branches for this asset
+    branches:
+      - 'main'
+    # Only consider pushes that change files for this asset, including ci scripts
+    paths:
+      - '.github/workflows/bulk-container.yaml'
+      - 'containers/controller/**'
+      - 'containers/trino/**'
+
+permissions:
+  contents: write
+  pull-requests: write
+  actions: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  # Cancel early on pull requests if new commits are added,
+  # Don't cancel on release pushes
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  # Job name must be unique across repo to target
+  # branch protection rules "required checks" properly!
+  repo:
+    uses: SwanseaUniversityMedical/workflows/.github/workflows/pr-and-release-repo.yaml@refactor/actions
+    with:
+      job-name: bulk-container-matrix
+      release-tag-format: 'v${version}-bulk-container-matrix'
+
+  bulk-controller-container:
+    needs: repo
+    uses: SwanseaUniversityMedical/workflows/.github/workflows/bulk-pr-and-release-container.yaml@refactor/actions
+    strategy:
+      matrix:
+        include:
+          - job-name: bulk-controller-container
+            registry-repo: ${{ vars.HARBOR_PROJECT }}/bulk-controller
+            build-file: containers/bulk-controller/Dockerfile
+            build-context: containers/bulk-controller
+
+          - job-name: bulk-trino-container
+            registry-repo: ${{ vars.HARBOR_PROJECT }}/bulk-trino
+            build-file: containers/trino/Dockerfile
+            build-context: containers/trino
+    with:
+      job-name: ${{ matrix.job-name }}
+      comment-pr: "true"
+      comment-release: "true"
+      registry: ${{ vars.HARBOR_REGISTRY }}
+      registry-user: ${{ vars.HARBOR_USER }}
+      registry-repo: ${{ matrix.registry-repo }}
+      release-info: ${{ needs.repo.outputs.release-info }}
+      cosign-public-key: ${{ vars.COSIGN_PUBLIC_KEY }}
+      build-file: ${{ matrix.build-file }}
+      build-context: ${{ matrix.build-context }}
+    secrets:
+      cosign-private-key: ${{ secrets.COSIGN_PRIVATE_KEY }}
+      cosign-password: ${{ secrets.COSIGN_PASSWORD }}
+      registry-token: ${{ secrets.HARBOR_TOKEN }}

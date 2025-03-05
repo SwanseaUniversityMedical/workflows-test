@@ -1,10 +1,11 @@
-name: Fizzbuzz CRDs Chart
+name: Bulk Chart Matrix
 
 on:
   pull_request:
     # Only consider PRs that change files for this asset, including ci scripts
     paths:
-      - '.github/workflows/fizzbuzz-crds-chart.yaml'
+      - '.github/workflows/bulk-chart.yaml'
+      - 'charts/fizzbuzz/**'
       - 'charts/fizzbuzz-crds/**'
   push:
     # Only release off of release and maintenance branches for this asset
@@ -12,7 +13,8 @@ on:
       - 'main'
     # Only consider pushes that change files for this asset, including ci scripts
     paths:
-      - '.github/workflows/fizzbuzz-crds-chart.yaml'
+      - '.github/workflows/bulk-chart.yaml'
+      - 'charts/fizzbuzz/**'
       - 'charts/fizzbuzz-crds/**'
 
 permissions:
@@ -29,19 +31,37 @@ concurrency:
 jobs:
   # Job name must be unique across repo to target
   # branch protection rules "required checks" properly!
-  fizzbuzz-crds-chart:
-    uses: SwanseaUniversityMedical/workflows/.github/workflows/pr-and-release-chart.yaml@refactor/actions
+
+  repo:
+    uses: SwanseaUniversityMedical/workflows/.github/workflows/pr-and-release-repo.yaml@refactor/actions
     with:
-      job-name: fizzbuzz-crds-chart
+      job-name: bulk-chart-matrix
+      release-tag-format: 'v${version}-bulk-chart-matrix'
+
+  bulk-chart:
+    needs: repo
+    uses: SwanseaUniversityMedical/workflows/.github/workflows/bulk-pr-and-release-chart.yaml@refactor/actions
+    strategy:
+      matrix:
+        include:
+          - job-name: bulk-fizzbuzz-chart
+            registry-repo: bulk-fizzbuzz
+            chart: charts/fizzbuzz
+
+          - job-name: bulk-fizzbuzz-crds-chart
+            registry-repo: bulk-fizzbuzz-crds
+            chart: charts/fizzbuzz-crds
+    with:
+      job-name: ${{ matrix.job-name }}
       comment-pr: "true"
       comment-release: "true"
       registry: ${{ vars.HARBOR_REGISTRY }}
       registry-user: ${{ vars.HARBOR_USER }}
       registry-project: ${{ vars.HARBOR_PROJECT }}
-      registry-repo: fizzbuzz-crds
-      release-tag-format: 'v${version}-fizzbuzz-crds-chart'
+      registry-repo: ${{ matrix.registry-repo }}
+      release-info: ${{ needs.repo.outputs.release-info }}
       cosign-public-key: ${{ vars.COSIGN_PUBLIC_KEY }}
-      chart: charts/fizzbuzz-crds
+      chart: ${{ matrix.chart }}
       test-command: |
         helm template $CHART --debug
 

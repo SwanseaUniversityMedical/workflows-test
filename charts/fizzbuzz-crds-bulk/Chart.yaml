@@ -1,6 +1,0 @@
-apiVersion: v2
-appVersion: 0.0.0
-description: Fizzbuzz CRDs.
-name: fizzbuzz-crds
-type: application
-version: 0.0.0
