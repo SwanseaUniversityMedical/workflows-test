@@ -2,7 +2,7 @@ name: Controller Container
 
 on:
   pull_request:
-    # Only consider PRs that change files for this asset, including ci scripts
+    # Only consider PRs that change files for this asset, including ci scripts.
     paths:
       - '.github/workflows/controller-container.yaml'
       - 'containers/controller/**'

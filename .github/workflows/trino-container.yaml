@@ -2,7 +2,7 @@ name: Trino Container
 
 on:
   pull_request:
-    # Only consider PRs that change files for this asset, including ci scripts
+    # Only consider PRs that change files for this asset, including ci scripts.
     paths:
       - '.github/workflows/trino-container.yaml'
       - 'containers/trino/**'
