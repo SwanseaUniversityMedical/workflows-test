@@ -61,12 +61,14 @@ module.exports = {
       groupName: "workflows non-major dependencies",
       groupSlug: "workflows-minor-patch",
       matchPackageNames: ["SwanseaUniversityMedical/workflows"],
-      matchUpdateTypes: ["minor", "patch"]
+      matchUpdateTypes: ["minor", "patch"],
+      schedule: ["* * * * *"],
     },
     {
       matchPackageNames: ["SwanseaUniversityMedical/workflows"],
       matchUpdateTypes: ["major"],
-      dependencyDashboardApproval: false
+      dependencyDashboardApproval: false,
+      schedule: ["* * * * *"],
     }
   ],
 

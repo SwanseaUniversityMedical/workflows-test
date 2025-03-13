@@ -7,10 +7,6 @@ export default {
     'scope-enum': [RuleConfigSeverity.Error, 'always', [
         '',
         'deps',
-        'controller-container',
-        'trino-container',
-        'fizzbuzz-chart',
-        'fizzbuzz-crds-chart'
     ]],
     'subject-case': [RuleConfigSeverity.Error, 'never', []],
   }
