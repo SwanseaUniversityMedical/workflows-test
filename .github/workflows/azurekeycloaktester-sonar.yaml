@@ -30,4 +30,4 @@ jobs:
       project-context: "containers/AzureKeycloakTester"
       sonar-url: ${{ vars.SONAR_PROD_URL }}
     secrets:
-      sonar-token: ${{ secrets.SONAR_PROD_TOKEN }}
+      sonar-token: ${{ secrets.SONAR_TOKEN }}
