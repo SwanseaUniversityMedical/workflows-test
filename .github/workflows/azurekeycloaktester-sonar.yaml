@@ -31,3 +31,4 @@ jobs:
       sonar-url: ${{ vars.SONAR_PROD_URL }}
     secrets:
       sonar-token: ${{ secrets.SONAR_PROD_TOKEN }}
+
