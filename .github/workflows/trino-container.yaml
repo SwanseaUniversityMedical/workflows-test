@@ -47,10 +47,10 @@ jobs:
       build-args: |
         FOO=foo
         BAR=bar
-      build-secrets: |
-        BAZ=baz
-        BIZ=biz
     secrets:
       cosign-private-key: ${{ secrets.COSIGN_PRIVATE_KEY }}
       cosign-password: ${{ secrets.COSIGN_PASSWORD }}
       registry-token: ${{ secrets.HARBOR_TOKEN }}
+      build-secrets: |
+        BAZ=${{ secrets.BAZ }}
+        BIZ=${{ secrets.BIZ }}
