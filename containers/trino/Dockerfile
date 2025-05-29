@@ -7,7 +7,7 @@ ARG BASE_VERSION
 
 ARG FOO
 ARG BAR
-RUN echo "build-args FOO=$FOO, BAR=$BAR"
+RUN echo "TEST build-args FOO=$FOO, BAR=$BAR"
 
 RUN --mount=type=secret,id=BAZ,env=BAZ --mount=type=secret,id=BIZ,env=BIZ \
-    echo "build-secrets BAZ=$BAZ, BIZ=$BIZ"
+    echo "TEST build-secrets BAZ=$BAZ, BIZ=$BIZ"
