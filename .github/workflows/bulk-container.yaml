@@ -39,7 +39,7 @@ jobs:
 
   bulk-container:
     needs: repo
-    uses: SwanseaUniversityMedical/workflows/.github/workflows/bulk-pr-and-release-container.yaml@v1.2.0-bulk-containers
+    uses: SwanseaUniversityMedical/workflows/.github/workflows/bulk-pr-and-release-container.yaml@v1.2.1-bulk-containers
     strategy:
       fail-fast: false
       matrix:
