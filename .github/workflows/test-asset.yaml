@@ -1,0 +1,40 @@
+name: Test Asset Action
+
+on:
+  pull_request:
+    types:
+      - opened
+      - reopened
+      - synchronize
+      - closed
+    paths:
+      - '.github/workflows/test-asset.yaml'
+  push:
+    tags:
+      - v*.*.*-test-asset
+    paths:
+      - '.github/workflows/test-asset.yaml'
+
+permissions:
+  actions: read
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  # Cancel early on pull requests if new commits are added
+  # Don't cancel on release pushes
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  test-asset:
+    runs-on:
+      labels: [self-hosted, linux, x64]
+      group: heavy
+
+    steps:
+      - uses: SwanseaUniversityMedical/workflows/.github/actions/asset@feat/tag-based-release-pipeline
+        with:
+          job-name: test-asset
+          comment-release: true
+          release-tag-format: 'v${version}-test-asset'
