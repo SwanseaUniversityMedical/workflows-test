@@ -35,6 +35,6 @@ jobs:
     steps:
       - uses: SwanseaUniversityMedical/workflows/.github/actions/asset@feat/tag-based-release-pipeline
         with:
-          job-name: test-asset
+          name: test-asset
           comment-release: true
           release-tag-format: 'v${version}-test-asset'
