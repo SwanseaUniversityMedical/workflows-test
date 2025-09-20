@@ -40,7 +40,7 @@ jobs:
 
   bulk-chart:
     needs: repo
-    uses: SwanseaUniversityMedical/workflows/.github/workflows/bulk-pr-and-release-chart.yaml@v2.0.0-bulk-charts
+    uses: SwanseaUniversityMedical/workflows/.github/workflows/bulk-pr-and-release-chart.yaml@v2.0.1-bulk-charts
     strategy:
       fail-fast: false
       matrix:
