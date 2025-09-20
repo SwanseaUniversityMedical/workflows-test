@@ -1,4 +1,4 @@
-name: Test Asset Action
+name: Test Asset Action.
 
 on:
   pull_request:
