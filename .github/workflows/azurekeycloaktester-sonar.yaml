@@ -23,11 +23,11 @@ concurrency:
 
 jobs:
   azurekeycloaktester-sonar:
-    uses: SwanseaUniversityMedical/workflows/.github/workflows/sonar-dotnet-7.yaml@v2.3.2-sonar-dotnet-7
+    uses: SwanseaUniversityMedical/workflows/.github/workflows/sonar-dotnet-8.yaml@feat/sonar-pull-request
     with:
       project-name: "workflows-test-azurekeycloaktester"
       project-file: "AzureKeycloakTester.csproj"
       project-context: "containers/AzureKeycloakTester"
-      sonar-url: ${{ vars.SONAR_PROD_URL }}
+      sonar-url: ${{ vars.SONAR_DEV_URL }}
     secrets:
-      sonar-token: ${{ secrets.SONAR_TOKEN }}
+      sonar-token: ${{ secrets.SONAR_DEV_TOKEN }}
