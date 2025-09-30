@@ -30,7 +30,7 @@ jobs:
   # Job name must be unique across repo to target
   # branch protection rules "required checks" properly!
   controller-container:
-    uses: SwanseaUniversityMedical/workflows/.github/workflows/pr-and-release-container.yaml@v3.3.1-containers
+    uses: SwanseaUniversityMedical/workflows/.github/workflows/pr-and-release-container.yaml@fix/determine-bump
     with:
       job-name: controller-container
       comment-pr: "true"
