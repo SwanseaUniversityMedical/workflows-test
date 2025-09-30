@@ -9,7 +9,7 @@ on:
   push:
     # Only release off of release and maintenance branches for this asset
     branches:
-      - 'main'
+      - 'release/foobar'
     # Only consider pushes that change files for this asset, including ci scripts
     paths:
       - '.github/workflows/controller-container.yaml'
@@ -37,8 +37,8 @@ jobs:
       comment-release: "true"
       registry: ${{ vars.HARBOR_REGISTRY }}
       registry-user: ${{ vars.HARBOR_USER }}
-      registry-repo: ${{ vars.HARBOR_PROJECT }}/controller
-      release-tag-format: 'v${version}-controller-container'
+      registry-repo: ${{ vars.HARBOR_PROJECT }}/controller-foobar
+      release-tag-format: 'v${version}-controller-container-foobar'
       cosign-public-key: ${{ vars.COSIGN_PUBLIC_KEY }}
       build-file: containers/controller/Dockerfile
       build-context: containers/controller

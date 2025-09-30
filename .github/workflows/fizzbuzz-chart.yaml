@@ -9,7 +9,7 @@ on:
   push:
     # Only release off of release and maintenance branches for this asset
     branches:
-      - 'main'
+      - 'release/foobar'
     # Only consider pushes that change files for this asset, including ci scripts
     paths:
       - '.github/workflows/fizzbuzz-chart.yaml'
@@ -30,7 +30,7 @@ jobs:
   # Job name must be unique across repo to target
   # branch protection rules "required checks" properly!
   fizzbuzz-chart:
-    uses: SwanseaUniversityMedical/workflows/.github/workflows/pr-and-release-chart.yaml@v3.1.1-charts
+    uses: SwanseaUniversityMedical/workflows/.github/workflows/pr-and-release-chart.yaml@fix/determine-bump
     with:
       job-name: fizzbuzz-chart
       comment-pr: "true"
@@ -38,8 +38,8 @@ jobs:
       registry: ${{ vars.HARBOR_REGISTRY }}
       registry-user: ${{ vars.HARBOR_USER }}
       registry-project: ${{ vars.HARBOR_PROJECT }}
-      registry-repo: fizzbuzz
-      release-tag-format: 'v${version}-fizzbuzz-chart'
+      registry-repo: fizzbuzz-foobar
+      release-tag-format: 'v${version}-fizzbuzz-chart-foobar'
       cosign-public-key: ${{ vars.COSIGN_PUBLIC_KEY }}
       chart: charts/fizzbuzz
       test-command: |
