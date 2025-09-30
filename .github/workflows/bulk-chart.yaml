@@ -10,7 +10,7 @@ on:
   push:
     # Only release off of release and maintenance branches for this asset
     branches:
-      - 'main'
+      - 'release/foobar'
     # Only consider pushes that change files for this asset, including ci scripts
     paths:
       - '.github/workflows/bulk-chart.yaml'
@@ -33,24 +33,24 @@ jobs:
   # branch protection rules "required checks" properly!
 
   repo:
-    uses: SwanseaUniversityMedical/workflows/.github/workflows/pr-and-release-repo.yaml@v2.1.0-repo
+    uses: SwanseaUniversityMedical/workflows/.github/workflows/pr-and-release-repo.yaml@fix/determine-bump
     with:
       job-name: bulk-chart-matrix
-      release-tag-format: 'v${version}-bulk-chart'
+      release-tag-format: 'v${version}-bulk-chart-foobar'
 
   bulk-chart:
     needs: repo
-    uses: SwanseaUniversityMedical/workflows/.github/workflows/bulk-pr-and-release-chart.yaml@v2.0.0-bulk-charts
+    uses: SwanseaUniversityMedical/workflows/.github/workflows/bulk-pr-and-release-chart.yaml@fix/determine-bump
     strategy:
       fail-fast: false
       matrix:
         include:
           - job-name: bulk-fizzbuzz-chart
-            registry-repo: bulk-fizzbuzz
+            registry-repo: bulk-fizzbuzz-foobar
             chart: charts/bulk-fizzbuzz
 
           - job-name: bulk-fizzbuzz-crds-chart
-            registry-repo: bulk-fizzbuzz-crds
+            registry-repo: bulk-fizzbuzz-crds-foobar
             chart: charts/bulk-fizzbuzz-crds
     name: ${{ matrix.job-name }}
     with:
