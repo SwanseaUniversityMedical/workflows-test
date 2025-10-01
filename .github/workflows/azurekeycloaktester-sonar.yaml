@@ -7,7 +7,7 @@ on:
       - '.github/workflows/azurekeycloaktester-sonar.yaml'
       - 'containers/AzureKeycloakTester/**'
   push:
-    # Only release off of release and maintenance branches for this asset
+    # Only release off of release and maintenance branches for this asset.
     branches:
       - 'main'
     # Only consider pushes that change files for this asset, including ci scripts
