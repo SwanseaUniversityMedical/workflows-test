@@ -288,6 +288,60 @@ jobs:
               }
             }`;
 
+            // Query to get project field information (for status field)
+            const getProjectFields = `query GetProjectFields($boardID: ID!) {
+              node(id: $boardID) {
+                ... on ProjectV2 {
+                  fields(first: 100) {
+                    nodes {
+                      ... on ProjectV2Field {
+                        id
+                        name
+                      }
+                      ... on ProjectV2SingleSelectField {
+                        id
+                        name
+                        options {
+                          id
+                          name
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }`;
+
+            // Mutation to update project item field value
+            const updateProjectItemField = `mutation UpdateProjectItemField($projectId: ID!, $itemId: ID!, $fieldId: ID!, $value: ProjectV2FieldValue!) {
+              updateProjectV2ItemFieldValue(input: {
+                projectId: $projectId
+                itemId: $itemId
+                fieldId: $fieldId
+                value: $value
+              }) {
+                projectV2Item {
+                  id
+                }
+              }
+            }`;
+
+            // Query to get detailed issue content for "Renovate failed" checking
+            const getIssueDetails = `query GetIssueDetails($issueId: ID!) {
+              node(id: $issueId) {
+                ... on Issue {
+                  id
+                  title
+                  body
+                  comments(first: 100) {
+                    nodes {
+                      body
+                    }
+                  }
+                }
+              }
+            }`;
+
             // Helper function to retry operations with exponential backoff
             async function retryWithBackoff(operation, maxRetries = 3, baseDelay = 1000) {
               for (let attempt = 1; attempt <= maxRetries; attempt++) {
@@ -435,3 +489,104 @@ jobs:
             } else {
               console.log('No new Dependency Dashboard issues to add - board is up to date');
             }
+
+            // Step 2: Update status fields based on "Renovate failed" content
+            console.log('\n--- Starting status field updates ---');
+            
+            // Get project fields to find the status field
+            const fieldsResponse = await github.graphql(getProjectFields, { boardID });
+            const statusField = fieldsResponse.node.fields.nodes.find(field => 
+              field.name && (field.name.toLowerCase().includes('status') || field.name.toLowerCase().includes('state'))
+            );
+            
+            if (!statusField) {
+              console.log('No status field found in project - skipping status updates');
+            } else {
+              console.log(`Found status field: ${statusField.name} (ID: ${statusField.id})`);
+              
+              // Find warning and ok status options
+              let warningOption = null;
+              let okOption = null;
+              
+              if (statusField.options) {
+                warningOption = statusField.options.find(option => 
+                  option.name.toLowerCase().includes('warning') || 
+                  option.name.toLowerCase().includes('failed') ||
+                  option.name.toLowerCase().includes('error')
+                );
+                okOption = statusField.options.find(option => 
+                  option.name.toLowerCase().includes('ok') || 
+                  option.name.toLowerCase().includes('success') ||
+                  option.name.toLowerCase().includes('good') ||
+                  option.name.toLowerCase().includes('ready')
+                );
+                
+                console.log(`Available status options: ${statusField.options.map(o => o.name).join(', ')}`);
+                console.log(`Warning option: ${warningOption?.name || 'Not found'}`);
+                console.log(`OK option: ${okOption?.name || 'Not found'}`);
+              }
+              
+              if (!warningOption || !okOption) {
+                console.log('Required status options (warning/ok) not found - skipping status updates');
+              } else {
+                // Scan through all current Dependency Dashboard issues to check for "Renovate failed"
+                console.log(`Scanning ${currentOpenDependencyDashboards.size} Dependency Dashboard issues for "Renovate failed" content`);
+                
+                for (const issueId of currentOpenDependencyDashboards) {
+                  try {
+                    // Get detailed issue content
+                    const issueResponse = await github.graphql(getIssueDetails, { issueId });
+                    const issue = issueResponse.node;
+                    
+                    // Check for "Renovate failed" in title, body, or comments
+                    let hasRenovateFailure = false;
+                    const searchText = 'renovate failed';
+                    
+                    if (issue.title && issue.title.toLowerCase().includes(searchText)) {
+                      hasRenovateFailure = true;
+                    } else if (issue.body && issue.body.toLowerCase().includes(searchText)) {
+                      hasRenovateFailure = true;
+                    } else {
+                      // Check comments
+                      for (const comment of issue.comments.nodes) {
+                        if (comment.body && comment.body.toLowerCase().includes(searchText)) {
+                          hasRenovateFailure = true;
+                          break;
+                        }
+                      }
+                    }
+                    
+                    // Determine the appropriate status
+                    const targetOption = hasRenovateFailure ? warningOption : okOption;
+                    const projectItemId = currentBoardItems.get(issueId);
+                    
+                    if (projectItemId) {
+                      try {
+                        await retryWithBackoff(async () => {
+                          return await github.graphql(updateProjectItemField, {
+                            projectId: boardID,
+                            itemId: projectItemId,
+                            fieldId: statusField.id,
+                            value: {
+                              singleSelectOptionId: targetOption.id
+                            }
+                          });
+                        });
+                        
+                        console.log(`✓ Updated issue ${issueId} to "${targetOption.name}" status (Renovate failed: ${hasRenovateFailure})`);
+                      } catch (error) {
+                        console.log(`✗ Failed to update status for issue ${issueId}: ${error.message}`);
+                      }
+                    }
+                    
+                    // Small delay between status updates
+                    await new Promise(resolve => setTimeout(resolve, 100));
+                    
+                  } catch (error) {
+                    console.log(`Error checking issue ${issueId} for Renovate failures: ${error.message}`);
+                  }
+                }
+              }
+            }
+            
+            console.log('\n--- Status field updates completed ---');
