@@ -19,16 +19,75 @@ jobs:
       group: light
     steps:
 
+      - name: Cache repository data
+        uses: actions/cache@v4
+        id: cache-repos
+        with:
+          path: |
+            .github/cache/repositories.json
+            .github/cache/project-items.json
+          key: dashboard-cache-${{ github.run_id }}
+          restore-keys: |
+            dashboard-cache-
+
       - uses: actions/github-script@v7
         id: dashboard-updater
         env:
           GITHUB_TOKEN: ${{ secrets.DASHBOARD_TEST_TOKEN }}
+          PROJECT_BOARD_ID: ${{ vars.PROJECT_BOARD_ID || '15' }}
+          ORG_NAME: ${{ vars.ORG_NAME || 'SwanseaUniversityMedical' }}
+          MAX_ITEMS_PER_QUERY: ${{ vars.MAX_ITEMS_PER_QUERY || '100' }}
+          BATCH_SIZE: ${{ vars.BATCH_SIZE || '10' }}
         with:
           result-encoding: string
           retries: 3
           retry-exempt-status-codes: 400,401
           github-token: ${{ secrets.DASHBOARD_TEST_TOKEN }}
           script: |
+            const fs = require('fs').promises;
+            const path = require('path');
+            
+            // Configuration from environment variables
+            const ORG_NAME = process.env.ORG_NAME;
+            const PROJECT_BOARD_NUMBER = parseInt(process.env.PROJECT_BOARD_ID);
+            const MAX_ITEMS = parseInt(process.env.MAX_ITEMS_PER_QUERY);
+            const BATCH_SIZE = parseInt(process.env.BATCH_SIZE);
+            
+            // Cache management
+            const CACHE_DIR = '.github/cache';
+            const REPOS_CACHE = path.join(CACHE_DIR, 'repositories.json');
+            const ITEMS_CACHE = path.join(CACHE_DIR, 'project-items.json');
+            
+            // Ensure cache directory exists
+            try {
+              await fs.mkdir(CACHE_DIR, { recursive: true });
+            } catch (e) {
+              // Directory might already exist
+            }
+            
+            // Helper function to read cache
+            async function readCache(filePath, maxAge = 300000) { // 5 minutes default
+              try {
+                const stats = await fs.stat(filePath);
+                const age = Date.now() - stats.mtime.getTime();
+                if (age < maxAge) {
+                  const content = await fs.readFile(filePath, 'utf8');
+                  return JSON.parse(content);
+                }
+              } catch (e) {
+                // Cache miss or error
+              }
+              return null;
+            }
+            
+            // Helper function to write cache
+            async function writeCache(filePath, data) {
+              try {
+                await fs.writeFile(filePath, JSON.stringify(data, null, 2));
+              } catch (e) {
+                console.log(`Failed to write cache: ${e.message}`);
+              }
+            }
             // This query deletes an item from the project board
             const clearQuery = `mutation ClearBoard($boardID: ID!, $itemID: ID!) {
               deleteProjectV2Item(input: {projectId: $boardID, itemId: $itemID}) {
@@ -55,8 +114,8 @@ jobs:
 
             // This query gets the ID of the project board
             const board = `query {
-                organization(login: "SwanseaUniversityMedical") {
-                  projectV2(number: 15) {
+                organization(login: "${ORG_NAME}") {
+                  projectV2(number: ${PROJECT_BOARD_NUMBER}) {
                     id
                   }
                 }
@@ -65,21 +124,17 @@ jobs:
             const boardData = await github.graphql(board);
             const boardID = boardData.organization.projectV2.id;
             
-            // Clear the contents of the project board
+            // Get current board items for comparison (for differential updates)
             let cursor = null;
             let hasNextPage = true;
-            const boardItems = [];
+            const currentBoardItems = new Set();
 
             while (hasNextPage) {
               const response = await github.graphql(getProjectData, { boardID, cursor });
-              boardItems.push(...response.node.items.items.map(item => item.node.id));
+              response.node.items.items.forEach(item => currentBoardItems.add(item.node.id));
               hasNextPage = response.node.items.pageInfo.hasNextPage;
               cursor = response.node.items.pageInfo.endCursor;
             }
-            
-            for (let i = 0; i < boardItems.length; i++) {
-                await github.graphql(clearQuery, { boardID, itemID: boardItems[i] });
-              }
    
 
             // This query gets a list of repositories in the organization
@@ -100,30 +155,54 @@ jobs:
               }
             }`;
 
-            // Build a list of repositories for the organization
-            cursor = null;
-            hasNextPage = true;
-            const repositories = [];
+            // Build a list of repositories for the organization (with caching)
+            let repositories = await readCache(REPOS_CACHE, 3600000); // Cache for 1 hour
+            
+            if (!repositories) {
+              cursor = null;
+              hasNextPage = true;
+              repositories = [];
 
-            while (hasNextPage) {
-              const response = await github.graphql(query, { cursor });
-              repositories.push(...response.search.repos.map(repo => repo.node.name));
-              hasNextPage = response.search.pageInfo.hasNextPage;
-              cursor = response.search.pageInfo.endCursor;
+              while (hasNextPage) {
+                const response = await github.graphql(query, { cursor });
+                repositories.push(...response.search.repos.map(repo => repo.node.name));
+                hasNextPage = response.search.pageInfo.hasNextPage;
+                cursor = response.search.pageInfo.endCursor;
+              }
+              
+              await writeCache(REPOS_CACHE, repositories);
+              console.log(`Fetched and cached ${repositories.length} repositories`);
+            } else {
+              console.log(`Using cached repository list: ${repositories.length} repositories`);
             }
 
-            // This query gets a list of PRs in the organization
-            const PRQuery = `query PRs($cursor: String, $repo: String!) {
+            // Combined query to get both PRs and Issues for a repository in one call
+            const combinedQuery = `query GetRepoItems($cursor: String, $repo: String!, $prCursor: String, $issueCursor: String) {
               organization(login: "SwanseaUniversityMedical") {
                 repository(name: $repo) {
-                  pullRequests(first: 100, after: $cursor, states: [OPEN]) {
+                  pullRequests(first: 100, after: $prCursor, states: [OPEN]) {
                     pageInfo {
                       hasNextPage
                       endCursor
                     }
-                    PRs: edges {
+                    edges {
                       node {
-                        id                        
+                        id
+                      }
+                    }
+                  }
+                  issues(first: 100, after: $issueCursor, states: [OPEN]) {
+                    pageInfo {
+                      hasNextPage
+                      endCursor
+                    }
+                    edges {
+                      node {
+                        id
+                        __typename
+                        ... on PullRequest {
+                          __typename
+                        }
                       }
                     }
                   }
@@ -131,18 +210,34 @@ jobs:
               }
             }`;
 
-            // This query gets a list of issues in the organization
-            const IssueQuery = `query Issues($cursor: String, $repo: String!) {
+            // Batch query to get multiple repositories' data at once (up to 10 repos per query)
+            const batchRepoQuery = `query GetMultipleRepos($repos: [String!]!) {
               organization(login: "SwanseaUniversityMedical") {
-                repository(name: $repo) {
-                  issues(first: 100, after: $cursor, states: [OPEN]) {
-                    pageInfo {
-                      hasNextPage
-                      endCursor
+                repositories: nodes {
+                  ... on Repository {
+                    name
+                    pullRequests(first: 100, states: [OPEN]) {
+                      totalCount
+                      pageInfo {
+                        hasNextPage
+                        endCursor
+                      }
+                      edges {
+                        node {
+                          id
+                        }
+                      }
                     }
-                    issues: edges {
-                      node {
-                        id                        
+                    issues(first: 100, states: [OPEN], filterBy: {createdBy: null}) {
+                      totalCount
+                      pageInfo {
+                        hasNextPage
+                        endCursor
+                      }
+                      edges {
+                        node {
+                          id
+                        }
                       }
                     }
                   }
@@ -150,7 +245,18 @@ jobs:
               }
             }`;
 
-            // This mutation adds an item to the project board
+            // Batch mutation to add multiple items to the project board at once
+            const addMultipleToBoard = `mutation AddMultipleToBoard($boardID: ID!, $items: [AddProjectV2ItemByIdInput!]!) {
+              ${Array.from({length: 50}, (_, i) => `
+                item${i}: addProjectV2ItemById(input: $items[${i}]) {
+                  item {
+                    id
+                  }
+                }
+              `).join('')}
+            }`;
+
+            // This mutation adds a single item to the project board
             const addToBoard = `mutation AddToBoard($boardID: ID!, $ID: ID!) {
               addProjectV2ItemById(input: {projectId: $boardID, contentId: $ID}) {
                 item {
@@ -158,39 +264,103 @@ jobs:
                 }
               }
             }`;
+
+            // Helper function to add items in batches
+            async function addItemsInBatches(items, batchSize = 50) {
+              for (let i = 0; i < items.length; i += batchSize) {
+                const batch = items.slice(i, i + batchSize);
+                const promises = batch.map(itemId => 
+                  github.graphql(addToBoard, { boardID, ID: itemId })
+                    .catch(error => console.log(`Failed to add item ${itemId}:`, error))
+                );
+                await Promise.allSettled(promises);
                 
-            // Get all PRs and then add them to the project board
-            for (let i = 0; i < repositories.length; i++) {
-              let cursor = null;
-              let hasNextPage = true;
-              const PRS = [];
-
-              while (hasNextPage) {
-                const response = await github.graphql(PRQuery, { cursor, repo: repositories[i] });
-                PRS.push(...response.organization.repository.pullRequests.PRs.map(pr => pr.node.id));
-                hasNextPage = response.organization.repository.pullRequests.pageInfo.hasNextPage;
-                cursor = response.organization.repository.pullRequests.pageInfo.endCursor;
-              }
-
-              for (let j = 0; j < PRS.length; j++) {
-                await github.graphql(addToBoard, { boardID, ID: PRS[j] });
+                // Add small delay to respect rate limits
+                if (i + batchSize < items.length) {
+                  await new Promise(resolve => setTimeout(resolve, 100));
+                }
               }
             }
 
-            // Get all issues and then add them to the project board
-            for (let i = 0; i < repositories.length; i++) {
-              let cursor = null;
-              let hasNextPage = true;
-              const issues = [];
+            // Collect all items to add to the project board
+            const allItemsToAdd = [];
 
-              while (hasNextPage) {
-                const response = await github.graphql(IssueQuery, { cursor, repo: repositories[i] });
-                issues.push(...response.organization.repository.issues.issues.map(issue => issue.node.id));
-                hasNextPage = response.organization.repository.issues.pageInfo.hasNextPage;
-                cursor = response.organization.repository.issues.pageInfo.endCursor;
-              }
+            // Process repositories in batches for better efficiency
+            const BATCH_SIZE = 10;
+            for (let i = 0; i < repositories.length; i += BATCH_SIZE) {
+              const reposBatch = repositories.slice(i, i + BATCH_SIZE);
+              
+              // Process each repository to get PRs and Issues
+              for (const repo of reposBatch) {
+                try {
+                  let prCursor = null;
+                  let issueCursor = null;
+                  let hasPRNextPage = true;
+                  let hasIssueNextPage = true;
 
-              for (let j = 0; j < issues.length; j++) {
-                await github.graphql(addToBoard, { boardID, ID: issues[j] });
+                  // Get all PRs and Issues for this repository
+                  while (hasPRNextPage || hasIssueNextPage) {
+                    const response = await github.graphql(combinedQuery, { 
+                      repo,
+                      prCursor: hasPRNextPage ? prCursor : null,
+                      issueCursor: hasIssueNextPage ? issueCursor : null
+                    });
+
+                    if (hasPRNextPage && response.organization.repository.pullRequests) {
+                      const prs = response.organization.repository.pullRequests;
+                      allItemsToAdd.push(...prs.edges.map(pr => pr.node.id));
+                      hasPRNextPage = prs.pageInfo.hasNextPage;
+                      prCursor = prs.pageInfo.endCursor;
+                    }
+
+                    if (hasIssueNextPage && response.organization.repository.issues) {
+                      const issues = response.organization.repository.issues;
+                      // Filter out PRs from issues (GitHub API includes PRs in issues)
+                      const pureIssues = issues.edges.filter(issue => issue.node.__typename !== 'PullRequest');
+                      allItemsToAdd.push(...pureIssues.map(issue => issue.node.id));
+                      hasIssueNextPage = issues.pageInfo.hasNextPage;
+                      issueCursor = issues.pageInfo.endCursor;
+                    }
+                  }
+                } catch (error) {
+                  console.log(`Error processing repository ${repo}:`, error);
+                  continue;
+                }
               }
+              
+              // Add small delay between repository batches
+              if (i + BATCH_SIZE < repositories.length) {
+                await new Promise(resolve => setTimeout(resolve, 200));
+              }
+            }
+
+            console.log(`Found ${allItemsToAdd.length} total items`);
+            
+            // Differential updates - only add items that aren't already on the board
+            const newItemsToAdd = allItemsToAdd.filter(itemId => !currentBoardItems.has(itemId));
+            const itemsToRemove = Array.from(currentBoardItems).filter(itemId => !allItemsToAdd.includes(itemId));
+            
+            console.log(`Adding ${newItemsToAdd.length} new items, removing ${itemsToRemove.length} outdated items`);
+            
+            // Remove outdated items in batches
+            if (itemsToRemove.length > 0) {
+              for (let i = 0; i < itemsToRemove.length; i += 50) {
+                const batch = itemsToRemove.slice(i, i + 50);
+                const promises = batch.map(itemId => 
+                  github.graphql(clearQuery, { boardID, itemID: itemId })
+                    .catch(error => console.log(`Failed to remove item ${itemId}:`, error))
+                );
+                await Promise.allSettled(promises);
+                
+                if (i + 50 < itemsToRemove.length) {
+                  await new Promise(resolve => setTimeout(resolve, 100));
+                }
+              }
+            }
+            
+            // Add only new items to the project board in batches
+            if (newItemsToAdd.length > 0) {
+              await addItemsInBatches(newItemsToAdd);
+            } else {
+              console.log('No new items to add - board is up to date');
             }
