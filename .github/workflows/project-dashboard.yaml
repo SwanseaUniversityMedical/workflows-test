@@ -6,7 +6,7 @@ on:
       - '.github/workflows/project-dashboard.yaml'
   workflow_dispatch:
   schedule:
-    - cron: '0 * * * *'
+    - cron: '0 1 * * *'
 
 concurrency:
   group: ${{ github.workflow }}
