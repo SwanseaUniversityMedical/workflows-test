@@ -286,7 +286,6 @@ jobs:
             const allItemsToAdd = [];
 
             // Process repositories in batches for better efficiency
-            const BATCH_SIZE = 10;
             for (let i = 0; i < repositories.length; i += BATCH_SIZE) {
               const reposBatch = repositories.slice(i, i + BATCH_SIZE);
               
