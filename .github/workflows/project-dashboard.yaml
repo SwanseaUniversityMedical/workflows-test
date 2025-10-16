@@ -139,7 +139,7 @@ jobs:
 
             // This query gets a list of repositories in the organization
             const query = `query Search($cursor: String) {
-              search(query: "org:SwanseaUniversityMedical", type: REPOSITORY, first: 100, after: $cursor) {
+              search(query: "org:${ORG_NAME}", type: REPOSITORY, first: 100, after: $cursor) {
                 pageInfo {
                   hasNextPage
                   endCursor
@@ -177,8 +177,8 @@ jobs:
             }
 
             // Combined query to get both PRs and Issues for a repository in one call
-            const combinedQuery = `query GetRepoItems($cursor: String, $repo: String!, $prCursor: String, $issueCursor: String) {
-              organization(login: "SwanseaUniversityMedical") {
+            const combinedQuery = `query GetRepoItems($repo: String!, $prCursor: String, $issueCursor: String) {
+              organization(login: "${ORG_NAME}") {
                 repository(name: $repo) {
                   pullRequests(first: 100, after: $prCursor, states: [OPEN]) {
                     pageInfo {
@@ -200,9 +200,6 @@ jobs:
                       node {
                         id
                         __typename
-                        ... on PullRequest {
-                          __typename
-                        }
                       }
                     }
                   }
@@ -212,7 +209,7 @@ jobs:
 
             // Batch query to get multiple repositories' data at once (up to 10 repos per query)
             const batchRepoQuery = `query GetMultipleRepos($repos: [String!]!) {
-              organization(login: "SwanseaUniversityMedical") {
+              organization(login: "${ORG_NAME}") {
                 repositories: nodes {
                   ... on Repository {
                     name
@@ -315,7 +312,8 @@ jobs:
                     if (hasIssueNextPage && response.organization.repository.issues) {
                       const issues = response.organization.repository.issues;
                       // Filter out PRs from issues (GitHub API includes PRs in issues)
-                      const pureIssues = issues.edges.filter(issue => issue.node.__typename !== 'PullRequest');
+                      // Issues that are actually PRs will have __typename as 'PullRequest'
+                      const pureIssues = issues.edges.filter(issue => issue.node.__typename === 'Issue');
                       allItemsToAdd.push(...pureIssues.map(issue => issue.node.id));
                       hasIssueNextPage = issues.pageInfo.hasNextPage;
                       issueCursor = issues.pageInfo.endCursor;
