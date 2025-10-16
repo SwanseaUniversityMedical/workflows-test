@@ -1,26 +1,14 @@
-name: Build Controller Container
+name: Controller Container
 
 on:
   pull_request:
-    # Ignore PRs on branches specifically intended for other assets
-    branches-ignore:
-      - '*/trino-container*'
-      - '*/fizzbuzz-chart*'
-      - '*/fizzbuzz-crds-chart*'
-    # Only consider PRs that change files for this asset, including ci scripts
+    # Only consider PRs that change files for this asset, including ci scripts.
     paths:
-      - '.github/workflows/flake8.yaml'
       - '.github/workflows/controller-container.yaml'
       - 'containers/controller/**'
-    # Make sure all workflows that are "required checks" for a given
-    # branch protection rule have the same paths: and branches-ignore:
-    # filters. Otherwise, you can end up in a deadlock waiting on a
-    # required check that will never be executed.
   push:
     # Only release off of release and maintenance branches for this asset
     branches:
-      - 'maintenance/controller-container/[0-9]+.x.x'
-      - 'maintenance/controller-container/[0-9]+.[0-9]+.x'
       - 'main'
     # Only consider pushes that change files for this asset, including ci scripts
     paths:
@@ -42,7 +30,7 @@ jobs:
   # Job name must be unique across repo to target
   # branch protection rules "required checks" properly!
   controller-container:
-    uses: SwanseaUniversityMedical/workflows/.github/workflows/pr-and-release-container.yaml@v2.0.1-containers
+    uses: SwanseaUniversityMedical/workflows/.github/workflows/pr-and-release-container.yaml@fix/determine-bump
     with:
       job-name: controller-container
       comment-pr: "true"
