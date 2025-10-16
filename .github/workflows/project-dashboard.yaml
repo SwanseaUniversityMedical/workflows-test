@@ -529,8 +529,8 @@ jobs:
               if (!warningOption || !okOption) {
                 console.log('Required status options (warning/ok) not found - skipping status updates');
               } else {
-                // Scan through all current Dependency Dashboard issues to check for "Renovate failed"
-                console.log(`Scanning ${currentOpenDependencyDashboards.size} Dependency Dashboard issues for "Renovate failed" content`);
+                // Scan through all current Dependency Dashboard issues to check for Renovate warnings
+                console.log(`Scanning ${currentOpenDependencyDashboards.size} Dependency Dashboard issues for Renovate warnings`);
                 
                 for (const issueId of currentOpenDependencyDashboards) {
                   try {
@@ -538,26 +538,36 @@ jobs:
                     const issueResponse = await github.graphql(getIssueDetails, { issueId });
                     const issue = issueResponse.node;
                     
-                    // Check for "Renovate failed" in title, body, or comments
-                    let hasRenovateFailure = false;
-                    const searchText = 'renovate failed';
+                    // Check for Renovate warnings in title, body, or comments
+                    let hasRenovateWarning = false;
+                    const warningPatterns = [
+                      'warning',
+                      '> [!warning]'
+                    ];
                     
-                    if (issue.title && issue.title.toLowerCase().includes(searchText)) {
-                      hasRenovateFailure = true;
-                    } else if (issue.body && issue.body.toLowerCase().includes(searchText)) {
-                      hasRenovateFailure = true;
+                    // Helper function to check text for warning patterns
+                    const containsWarning = (text) => {
+                      if (!text) return false;
+                      const lowerText = text.toLowerCase();
+                      return warningPatterns.some(pattern => lowerText.includes(pattern));
+                    };
+                    
+                    if (containsWarning(issue.title)) {
+                      hasRenovateWarning = true;
+                    } else if (containsWarning(issue.body)) {
+                      hasRenovateWarning = true;
                     } else {
                       // Check comments
                       for (const comment of issue.comments.nodes) {
-                        if (comment.body && comment.body.toLowerCase().includes(searchText)) {
-                          hasRenovateFailure = true;
+                        if (containsWarning(comment.body)) {
+                          hasRenovateWarning = true;
                           break;
                         }
                       }
                     }
                     
                     // Determine the appropriate status
-                    const targetOption = hasRenovateFailure ? warningOption : okOption;
+                    const targetOption = hasRenovateWarning ? warningOption : okOption;
                     const projectItemId = currentBoardItems.get(issueId);
                     
                     if (projectItemId) {
@@ -573,7 +583,7 @@ jobs:
                           });
                         });
                         
-                        console.log(`✓ Updated issue ${issueId} to "${targetOption.name}" status (Renovate failed: ${hasRenovateFailure})`);
+                        console.log(`✓ Updated issue ${issueId} to "${targetOption.name}" status (Renovate warning: ${hasRenovateWarning})`);
                       } catch (error) {
                         console.log(`✗ Failed to update status for issue ${issueId}: ${error.message}`);
                       }
