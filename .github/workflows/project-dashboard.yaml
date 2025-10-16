@@ -176,21 +176,10 @@ jobs:
               console.log(`Using cached repository list: ${repositories.length} repositories`);
             }
 
-            // Combined query to get both PRs and Issues for a repository in one call
-            const combinedQuery = `query GetRepoItems($repo: String!, $prCursor: String, $issueCursor: String) {
+            // Query to get only "Dependency Dashboard" issues for a repository
+            const issuesQuery = `query GetRepoIssues($repo: String!, $issueCursor: String) {
               organization(login: "${ORG_NAME}") {
                 repository(name: $repo) {
-                  pullRequests(first: 100, after: $prCursor, states: [OPEN]) {
-                    pageInfo {
-                      hasNextPage
-                      endCursor
-                    }
-                    edges {
-                      node {
-                        id
-                      }
-                    }
-                  }
                   issues(first: 100, after: $issueCursor, states: [OPEN]) {
                     pageInfo {
                       hasNextPage
@@ -199,6 +188,7 @@ jobs:
                     edges {
                       node {
                         id
+                        title
                         __typename
                       }
                     }
@@ -207,13 +197,13 @@ jobs:
               }
             }`;
 
-            // Batch query to get multiple repositories' data at once (up to 10 repos per query)
+            // Batch query to get multiple repositories' dependency dashboard issues at once
             const batchRepoQuery = `query GetMultipleRepos($repos: [String!]!) {
               organization(login: "${ORG_NAME}") {
                 repositories: nodes {
                   ... on Repository {
                     name
-                    pullRequests(first: 100, states: [OPEN]) {
+                    issues(first: 100, states: [OPEN]) {
                       totalCount
                       pageInfo {
                         hasNextPage
@@ -222,18 +212,8 @@ jobs:
                       edges {
                         node {
                           id
-                        }
-                      }
-                    }
-                    issues(first: 100, states: [OPEN], filterBy: {createdBy: null}) {
-                      totalCount
-                      pageInfo {
-                        hasNextPage
-                        endCursor
-                      }
-                      edges {
-                        node {
-                          id
+                          title
+                          __typename
                         }
                       }
                     }
@@ -279,42 +259,34 @@ jobs:
               }
             }
 
-            // Collect all items to add to the project board
+            // Collect all "Dependency Dashboard" issues to add to the project board
             const allItemsToAdd = [];
 
             // Process repositories in batches for better efficiency
             for (let i = 0; i < repositories.length; i += BATCH_SIZE) {
               const reposBatch = repositories.slice(i, i + BATCH_SIZE);
               
-              // Process each repository to get PRs and Issues
+              // Process each repository to get only "Dependency Dashboard" issues
               for (const repo of reposBatch) {
                 try {
-                  let prCursor = null;
                   let issueCursor = null;
-                  let hasPRNextPage = true;
                   let hasIssueNextPage = true;
 
-                  // Get all PRs and Issues for this repository
-                  while (hasPRNextPage || hasIssueNextPage) {
-                    const response = await github.graphql(combinedQuery, { 
+                  // Get all Issues for this repository
+                  while (hasIssueNextPage) {
+                    const response = await github.graphql(issuesQuery, { 
                       repo,
-                      prCursor: hasPRNextPage ? prCursor : null,
                       issueCursor: hasIssueNextPage ? issueCursor : null
                     });
 
-                    if (hasPRNextPage && response.organization.repository.pullRequests) {
-                      const prs = response.organization.repository.pullRequests;
-                      allItemsToAdd.push(...prs.edges.map(pr => pr.node.id));
-                      hasPRNextPage = prs.pageInfo.hasNextPage;
-                      prCursor = prs.pageInfo.endCursor;
-                    }
-
                     if (hasIssueNextPage && response.organization.repository.issues) {
                       const issues = response.organization.repository.issues;
-                      // Filter out PRs from issues (GitHub API includes PRs in issues)
-                      // Issues that are actually PRs will have __typename as 'PullRequest'
-                      const pureIssues = issues.edges.filter(issue => issue.node.__typename === 'Issue');
-                      allItemsToAdd.push(...pureIssues.map(issue => issue.node.id));
+                      // Filter for only "Dependency Dashboard" issues that are actual Issues (not PRs)
+                      const dependencyDashboardIssues = issues.edges.filter(issue => 
+                        issue.node.__typename === 'Issue' && 
+                        issue.node.title === 'Dependency Dashboard'
+                      );
+                      allItemsToAdd.push(...dependencyDashboardIssues.map(issue => issue.node.id));
                       hasIssueNextPage = issues.pageInfo.hasNextPage;
                       issueCursor = issues.pageInfo.endCursor;
                     }
@@ -331,13 +303,13 @@ jobs:
               }
             }
 
-            console.log(`Found ${allItemsToAdd.length} total items`);
+            console.log(`Found ${allItemsToAdd.length} "Dependency Dashboard" issues`);
             
             // Differential updates - only add items that aren't already on the board
             const newItemsToAdd = allItemsToAdd.filter(itemId => !currentBoardItems.has(itemId));
             const itemsToRemove = Array.from(currentBoardItems).filter(itemId => !allItemsToAdd.includes(itemId));
             
-            console.log(`Adding ${newItemsToAdd.length} new items, removing ${itemsToRemove.length} outdated items`);
+            console.log(`Adding ${newItemsToAdd.length} new Dependency Dashboard issues, removing ${itemsToRemove.length} outdated items`);
             
             // Remove outdated items in batches
             if (itemsToRemove.length > 0) {
@@ -355,9 +327,9 @@ jobs:
               }
             }
             
-            // Add only new items to the project board in batches
+            // Add only new Dependency Dashboard issues to the project board in batches
             if (newItemsToAdd.length > 0) {
               await addItemsInBatches(newItemsToAdd);
             } else {
-              console.log('No new items to add - board is up to date');
+              console.log('No new Dependency Dashboard issues to add - board is up to date');
             }
