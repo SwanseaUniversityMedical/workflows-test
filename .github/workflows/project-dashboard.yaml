@@ -95,7 +95,7 @@ jobs:
               }
             }`;
 
-            // This query gets a list of items on the project board
+            // This query gets a list of items on the project board with their content details
             const getProjectData = `query GetProjectData($boardID: ID!, $cursor: String){node(id: $boardID) {
               ... on ProjectV2 {
                 items(first: 100, after: $cursor) {
@@ -106,6 +106,20 @@ jobs:
                   items: edges {
                     node {
                       id
+                      content {
+                        ... on Issue {
+                          id
+                          title
+                          state
+                          __typename
+                        }
+                        ... on PullRequest {
+                          id
+                          title
+                          state
+                          __typename
+                        }
+                      }
                    }
                   }
                 }
@@ -124,17 +138,49 @@ jobs:
             const boardData = await github.graphql(board);
             const boardID = boardData.organization.projectV2.id;
             
-            // Get current board items for comparison (for differential updates)
+            // Get current board items with their content details (for differential updates)
             let cursor = null;
             let hasNextPage = true;
-            const currentBoardItems = new Set();
+            const currentBoardItems = new Map(); // Map of contentId -> projectItemId
+            const currentOpenDependencyDashboards = new Set();
+            const itemsToRemove = [];
 
             while (hasNextPage) {
               const response = await github.graphql(getProjectData, { boardID, cursor });
-              response.node.items.items.forEach(item => currentBoardItems.add(item.node.id));
+              response.node.items.items.forEach(item => {
+                const projectItemId = item.node.id;
+                const content = item.node.content;
+                
+                if (content) {
+                  currentBoardItems.set(content.id, projectItemId);
+                  
+                  // Check if this is a "Dependency Dashboard" issue
+                  if (content.__typename === 'Issue' && content.title === 'Dependency Dashboard') {
+                    if (content.state === 'OPEN') {
+                      currentOpenDependencyDashboards.add(content.id);
+                    } else if (content.state === 'CLOSED') {
+                      // Mark closed Dependency Dashboard issues for removal
+                      itemsToRemove.push(projectItemId);
+                      console.log(`Marking closed Dependency Dashboard issue ${content.id} for removal`);
+                    }
+                  }
+                  // Remove any PRs that might have been added previously (since we now only want issues)
+                  else if (content.__typename === 'PullRequest') {
+                    itemsToRemove.push(projectItemId);
+                    console.log(`Marking PR ${content.id} for removal (we only want issues now)`);
+                  }
+                  // Remove any non-Dependency Dashboard issues that might have been added previously
+                  else if (content.__typename === 'Issue' && content.title !== 'Dependency Dashboard') {
+                    itemsToRemove.push(projectItemId);
+                    console.log(`Marking non-Dependency Dashboard issue "${content.title}" for removal`);
+                  }
+                }
+              });
               hasNextPage = response.node.items.pageInfo.hasNextPage;
               cursor = response.node.items.pageInfo.endCursor;
             }
+
+            console.log(`Current board has ${currentBoardItems.size} items, ${currentOpenDependencyDashboards.size} open Dependency Dashboard issues, ${itemsToRemove.length} items marked for removal`);
    
 
             // This query gets a list of repositories in the organization
@@ -349,28 +395,27 @@ jobs:
             console.log(`Found ${allItemsToAdd.length} "Dependency Dashboard" issues (${uniqueItemsToAdd.length} unique)`);
             
             // Differential updates - only add items that aren't already on the board
-            const newItemsToAdd = uniqueItemsToAdd.filter(itemId => !currentBoardItems.has(itemId));
-            const itemsToRemove = Array.from(currentBoardItems).filter(itemId => !uniqueItemsToAdd.includes(itemId));
+            const newItemsToAdd = uniqueItemsToAdd.filter(itemId => !currentOpenDependencyDashboards.has(itemId));
             
-            console.log(`Adding ${newItemsToAdd.length} new Dependency Dashboard issues, removing ${itemsToRemove.length} outdated items`);
+            console.log(`Adding ${newItemsToAdd.length} new Dependency Dashboard issues, removing ${itemsToRemove.length} closed/invalid items`);
             
-            // Remove outdated items in batches with improved error handling
+            // Remove closed/invalid items in batches with improved error handling
             if (itemsToRemove.length > 0) {
-              console.log(`Removing ${itemsToRemove.length} outdated items`);
+              console.log(`Removing ${itemsToRemove.length} closed/invalid items`);
               
               for (let i = 0; i < itemsToRemove.length; i += 20) { // Reduced batch size
                 const batch = itemsToRemove.slice(i, i + 20);
                 console.log(`Removing batch ${Math.floor(i/20) + 1}/${Math.ceil(itemsToRemove.length/20)} (${batch.length} items)`);
                 
                 // Process removals sequentially to avoid conflicts
-                for (const itemId of batch) {
+                for (const projectItemId of batch) {
                   try {
                     await retryWithBackoff(async () => {
-                      return await github.graphql(clearQuery, { boardID, itemID: itemId });
+                      return await github.graphql(clearQuery, { boardID, itemID: projectItemId });
                     });
-                    console.log(`✓ Successfully removed item ${itemId}`);
+                    console.log(`✓ Successfully removed project item ${projectItemId}`);
                   } catch (error) {
-                    console.log(`✗ Failed to remove item ${itemId} after retries: ${error.message}`);
+                    console.log(`✗ Failed to remove project item ${projectItemId} after retries: ${error.message}`);
                   }
                   
                   // Small delay between individual removals
