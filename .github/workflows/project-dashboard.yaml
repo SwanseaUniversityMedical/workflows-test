@@ -242,19 +242,60 @@ jobs:
               }
             }`;
 
-            // Helper function to add items in batches
-            async function addItemsInBatches(items, batchSize = 50) {
+            // Helper function to retry operations with exponential backoff
+            async function retryWithBackoff(operation, maxRetries = 3, baseDelay = 1000) {
+              for (let attempt = 1; attempt <= maxRetries; attempt++) {
+                try {
+                  return await operation();
+                } catch (error) {
+                  if (attempt === maxRetries) {
+                    throw error;
+                  }
+                  
+                  // Check if it's a temporary conflict that we should retry
+                  const isRetryable = error.message && (
+                    error.message.includes('temporary conflict') ||
+                    error.message.includes('rate limit') ||
+                    error.message.includes('timeout')
+                  );
+                  
+                  if (isRetryable) {
+                    const delay = baseDelay * Math.pow(2, attempt - 1) + Math.random() * 1000;
+                    console.log(`Attempt ${attempt} failed, retrying in ${Math.round(delay)}ms: ${error.message}`);
+                    await new Promise(resolve => setTimeout(resolve, delay));
+                  } else {
+                    throw error;
+                  }
+                }
+              }
+            }
+
+            // Helper function to add items in batches with improved error handling
+            async function addItemsInBatches(items, batchSize = 20) { // Reduced batch size for better stability
+              console.log(`Processing ${items.length} items in batches of ${batchSize}`);
+              
               for (let i = 0; i < items.length; i += batchSize) {
                 const batch = items.slice(i, i + batchSize);
-                const promises = batch.map(itemId => 
-                  github.graphql(addToBoard, { boardID, ID: itemId })
-                    .catch(error => console.log(`Failed to add item ${itemId}:`, error))
-                );
-                await Promise.allSettled(promises);
+                console.log(`Processing batch ${Math.floor(i/batchSize) + 1}/${Math.ceil(items.length/batchSize)} (${batch.length} items)`);
                 
-                // Add small delay to respect rate limits
+                // Process items sequentially within each batch to avoid conflicts
+                for (const itemId of batch) {
+                  try {
+                    await retryWithBackoff(async () => {
+                      return await github.graphql(addToBoard, { boardID, ID: itemId });
+                    });
+                    console.log(`✓ Successfully added item ${itemId}`);
+                  } catch (error) {
+                    console.log(`✗ Failed to add item ${itemId} after retries: ${error.message}`);
+                  }
+                  
+                  // Small delay between individual items
+                  await new Promise(resolve => setTimeout(resolve, 50));
+                }
+                
+                // Longer delay between batches
                 if (i + batchSize < items.length) {
-                  await new Promise(resolve => setTimeout(resolve, 100));
+                  await new Promise(resolve => setTimeout(resolve, 500));
                 }
               }
             }
@@ -303,26 +344,42 @@ jobs:
               }
             }
 
-            console.log(`Found ${allItemsToAdd.length} "Dependency Dashboard" issues`);
+            // Remove duplicates from items to add
+            const uniqueItemsToAdd = [...new Set(allItemsToAdd)];
+            console.log(`Found ${allItemsToAdd.length} "Dependency Dashboard" issues (${uniqueItemsToAdd.length} unique)`);
             
             // Differential updates - only add items that aren't already on the board
-            const newItemsToAdd = allItemsToAdd.filter(itemId => !currentBoardItems.has(itemId));
-            const itemsToRemove = Array.from(currentBoardItems).filter(itemId => !allItemsToAdd.includes(itemId));
+            const newItemsToAdd = uniqueItemsToAdd.filter(itemId => !currentBoardItems.has(itemId));
+            const itemsToRemove = Array.from(currentBoardItems).filter(itemId => !uniqueItemsToAdd.includes(itemId));
             
             console.log(`Adding ${newItemsToAdd.length} new Dependency Dashboard issues, removing ${itemsToRemove.length} outdated items`);
             
-            // Remove outdated items in batches
+            // Remove outdated items in batches with improved error handling
             if (itemsToRemove.length > 0) {
-              for (let i = 0; i < itemsToRemove.length; i += 50) {
-                const batch = itemsToRemove.slice(i, i + 50);
-                const promises = batch.map(itemId => 
-                  github.graphql(clearQuery, { boardID, itemID: itemId })
-                    .catch(error => console.log(`Failed to remove item ${itemId}:`, error))
-                );
-                await Promise.allSettled(promises);
+              console.log(`Removing ${itemsToRemove.length} outdated items`);
+              
+              for (let i = 0; i < itemsToRemove.length; i += 20) { // Reduced batch size
+                const batch = itemsToRemove.slice(i, i + 20);
+                console.log(`Removing batch ${Math.floor(i/20) + 1}/${Math.ceil(itemsToRemove.length/20)} (${batch.length} items)`);
                 
-                if (i + 50 < itemsToRemove.length) {
-                  await new Promise(resolve => setTimeout(resolve, 100));
+                // Process removals sequentially to avoid conflicts
+                for (const itemId of batch) {
+                  try {
+                    await retryWithBackoff(async () => {
+                      return await github.graphql(clearQuery, { boardID, itemID: itemId });
+                    });
+                    console.log(`✓ Successfully removed item ${itemId}`);
+                  } catch (error) {
+                    console.log(`✗ Failed to remove item ${itemId} after retries: ${error.message}`);
+                  }
+                  
+                  // Small delay between individual removals
+                  await new Promise(resolve => setTimeout(resolve, 50));
+                }
+                
+                // Longer delay between batches
+                if (i + 20 < itemsToRemove.length) {
+                  await new Promise(resolve => setTimeout(resolve, 500));
                 }
               }
             }
