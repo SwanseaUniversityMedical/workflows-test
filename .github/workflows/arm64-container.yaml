@@ -1,0 +1,48 @@
+name: Arm64 Container
+
+on:
+  pull_request:
+    # Only consider PRs that change files for this asset, including ci scripts.
+    paths:
+      - '.github/workflows/arm64-container.yaml'
+      - 'containers/controller/**'
+  push:
+    # Only release off of release and maintenance branches for this asset
+    branches:
+      - 'main'
+    # Only consider pushes that change files for this asset, including ci scripts
+    paths:
+      - '.github/workflows/arm64-container.yaml'
+      - 'containers/controller/**'
+
+permissions:
+  contents: write
+  pull-requests: write
+  actions: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  # Cancel early on pull requests if new commits are added,
+  # Don't cancel on release pushes
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  # Job name must be unique across repo to target
+  # branch protection rules "required checks" properly!
+  controller-container:
+    uses: SwanseaUniversityMedical/workflows/.github/workflows/pr-and-release-arm64-container.yaml@add-platforms
+    with:
+      job-name: arm64-container
+      comment-pr: "true"
+      comment-release: "true"
+      registry: ${{ vars.HARBOR_REGISTRY }}
+      registry-user: ${{ vars.HARBOR_USER }}
+      registry-repo: ${{ vars.HARBOR_PROJECT }}/arm64-controller
+      release-tag-format: 'v${version}-arm64-controller-container'
+      cosign-public-key: ${{ vars.COSIGN_PUBLIC_KEY }}
+      build-file: containers/controller/Dockerfile
+      build-context: containers/controller
+    secrets:
+      cosign-private-key: ${{ secrets.COSIGN_PRIVATE_KEY }}
+      cosign-password: ${{ secrets.COSIGN_PASSWORD }}
+      registry-token: ${{ secrets.HARBOR_TOKEN }}
