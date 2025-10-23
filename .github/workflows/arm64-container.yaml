@@ -29,16 +29,16 @@ concurrency:
 jobs:
   # Job name must be unique across repo to target
   # branch protection rules "required checks" properly!
-  controller-container:
-    uses: SwanseaUniversityMedical/workflows/.github/workflows/pr-and-release-arm64-container.yaml@add-platforms
+  arm-controller-container:
+    uses: SwanseaUniversityMedical/workflows/.github/workflows/pr-and-release-arm-container.yaml@feat/multiarch-builds
     with:
-      job-name: arm64-container
+      job-name: arm-container
       comment-pr: "true"
       comment-release: "true"
       registry: ${{ vars.HARBOR_REGISTRY }}
       registry-user: ${{ vars.HARBOR_USER }}
-      registry-repo: ${{ vars.HARBOR_PROJECT }}/arm64-controller
-      release-tag-format: 'v${version}-arm64-controller-container'
+      registry-repo: ${{ vars.HARBOR_PROJECT }}/arm-controller
+      release-tag-format: 'v${version}-arm-controller-container'
       cosign-public-key: ${{ vars.COSIGN_PUBLIC_KEY }}
       build-file: containers/controller/Dockerfile
       build-context: containers/controller
