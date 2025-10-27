@@ -30,7 +30,7 @@ jobs:
   # Job name must be unique across repo to target
   # branch protection rules "required checks" properly!
   controller-container:
-    uses: SwanseaUniversityMedical/workflows/.github/workflows/pr-and-release-multi-platform-containers.yaml@feat/multiarch-builds
+    uses: SwanseaUniversityMedical/workflows/.github/workflows/pr-and-release-multi-platform-container.yaml@feat/multiarch-builds
     with:
       job-name: controller-container
       comment-pr: "true"
