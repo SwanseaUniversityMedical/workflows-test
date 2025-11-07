@@ -10,7 +10,7 @@ on:
   push:
     # Only release off of release and maintenance branches for this asset
     branches:
-      - 'main'
+      - 'release/foobar'
     # Only consider pushes that change files for this asset, including ci scripts
     paths:
       - '.github/workflows/bulk-container.yaml'
@@ -35,7 +35,7 @@ jobs:
     uses: SwanseaUniversityMedical/workflows/.github/workflows/pr-and-release-repo.yaml@v2.1.0-repo
     with:
       job-name: bulk-container-matrix
-      release-tag-format: 'v${version}-bulk-container'
+      release-tag-format: 'v${version}-bulk-container-foobar'
 
   bulk-container:
     needs: repo
@@ -45,12 +45,12 @@ jobs:
       matrix:
         include:
           - job-name: bulk-controller-container
-            registry-repo: ${{ vars.HARBOR_PROJECT }}/bulk-controller
+            registry-repo: ${{ vars.HARBOR_PROJECT }}/bulk-controller-foobar
             build-file: containers/controller/Dockerfile
             build-context: containers/controller
 
           - job-name: bulk-trino-container
-            registry-repo: ${{ vars.HARBOR_PROJECT }}/bulk-trino
+            registry-repo: ${{ vars.HARBOR_PROJECT }}/bulk-trino-foobar
             build-file: containers/trino/Dockerfile
             build-context: containers/trino
     name: ${{ matrix.job-name }}
