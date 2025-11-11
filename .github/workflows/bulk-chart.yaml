@@ -33,14 +33,14 @@ jobs:
   # branch protection rules "required checks" properly!
 
   repo:
-    uses: SwanseaUniversityMedical/workflows/.github/workflows/pr-and-release-repo.yaml@v2.1.0-repo
+    uses: SwanseaUniversityMedical/workflows/.github/workflows/pr-and-release-repo.yaml@v2.1.1-repo
     with:
       job-name: bulk-chart-matrix
       release-tag-format: 'v${version}-bulk-chart'
 
   bulk-chart:
     needs: repo
-    uses: SwanseaUniversityMedical/workflows/.github/workflows/bulk-pr-and-release-chart.yaml@v2.0.0-bulk-charts
+    uses: SwanseaUniversityMedical/workflows/.github/workflows/bulk-pr-and-release-chart.yaml@v2.0.1-bulk-charts
     strategy:
       fail-fast: false
       matrix:
