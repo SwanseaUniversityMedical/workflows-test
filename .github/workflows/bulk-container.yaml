@@ -39,7 +39,7 @@ jobs:
 
   bulk-container:
     needs: repo
-    uses: SwanseaUniversityMedical/workflows/.github/workflows/bulk-pr-and-release-container.yaml@fix/determine-bump
+    uses: SwanseaUniversityMedical/workflows/.github/workflows/bulk-pr-and-release-container.yaml@v3.4.2-containers
     strategy:
       fail-fast: false
       matrix:
