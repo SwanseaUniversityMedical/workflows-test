@@ -1,0 +1,20 @@
+name: Controller Ruff
+
+on:
+  pull_request:
+    # Only consider PRs that change files for this asset, including ci scripts
+    paths:
+      - '.github/workflows/controller-ruff.yaml'
+      - 'containers/controller/**'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  # This linting can be cancelled if there is a newer commit to lint
+  cancel-in-progress: true
+
+jobs:
+  controller-ruff:
+    uses: SwanseaUniversityMedical/workflows/.github/workflows/ruff.yaml@feat/ruff-ci
+      with:
+        config-file: 'ruff.toml'
+        source-path: 'containers/controller/src'
