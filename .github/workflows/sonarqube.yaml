@@ -65,7 +65,6 @@ jobs:
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_DEV_TOKEN }}
           SONAR_HOST_URL: ${{ vars.SONAR_DEV_URL }}
-          SONAR_ROOT_CERT: ${{ secrets.SONAR_ROOT_CERT }}
 
 
       - name: scan source code and tests on push
@@ -84,4 +83,3 @@ jobs:
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_DEV_TOKEN }}
           SONAR_HOST_URL: ${{ vars.SONAR_DEV_URL }}
-          SONAR_ROOT_CERT: ${{ secrets.SONAR_ROOT_CERT }}
