@@ -10,6 +10,10 @@ on:
     paths:
       - '.github/workflows/dlm-dags-sonar.yaml'
       - 'dags/**'
+  pull_request:
+    paths:
+      - '.github/workflows/dlm-dags-sonar.yaml'
+      - 'dags/**'
 
 jobs:
   scan-code:
