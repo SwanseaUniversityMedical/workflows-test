@@ -16,6 +16,9 @@ on:
       - '.github/workflows/bulk-chart.yaml'
       - 'charts/fizzbuzz/**'
       - 'charts/fizzbuzz-crds/**'
+  merge_group:
+    types:
+      - checks_requested
 
 permissions:
   contents: write
