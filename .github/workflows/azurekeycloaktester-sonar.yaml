@@ -26,7 +26,7 @@ concurrency:
 
 jobs:
   azurekeycloaktester-sonar:
-    uses: SwanseaUniversityMedical/workflows/.github/workflows/sonar-dotnet-8.yaml@feat/sonar-pull-request
+    uses: SwanseaUniversityMedical/workflows/.github/workflows/sonar-dotnet-8.yaml@v1.4.0-sonar-dotnet-8-action
     with:
       project-name: "workflows-test-azurekeycloaktester"
       project-file: "AzureKeycloakTester.csproj"
