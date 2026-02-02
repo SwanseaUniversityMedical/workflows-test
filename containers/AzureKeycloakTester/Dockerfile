@@ -35,4 +35,5 @@ RUN sed -i 's/DEFAULT@SECLEVEL=2/DEFAULT@SECLEVEL=1/g' /etc/ssl/openssl.cnf
 ## Now switch user
 #USER 1012
 
+
 ENTRYPOINT ["dotnet", "AzureKeycloakTester.dll"]
