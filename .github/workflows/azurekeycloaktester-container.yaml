@@ -14,6 +14,9 @@ on:
     paths:
       - '.github/workflows/azurekeycloaktester-container.yaml'
       - 'containers/AzureKeycloakTester/**'
+  merge_group:
+    types:
+      - checks_requested
 
 permissions:
   contents: write

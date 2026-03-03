@@ -16,6 +16,9 @@ on:
       - '.github/workflows/bulk-container.yaml'
       - 'containers/controller/**'
       - 'containers/trino/**'
+  merge_group:
+    types:
+      - checks_requested
 
 permissions:
   contents: write
