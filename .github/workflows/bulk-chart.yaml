@@ -2,7 +2,7 @@ name: Bulk Chart
 
 on:
   pull_request:
-    # Only consider PRs that change files for this asset, including ci scripts.
+    # Only consider PRs that change files for this asset, including ci scripts..
     paths:
       - '.github/workflows/bulk-chart.yaml'
       - 'charts/fizzbuzz/**'
@@ -43,7 +43,7 @@ jobs:
 
   bulk-chart:
     needs: repo
-    uses: SwanseaUniversityMedical/workflows/.github/workflows/bulk-pr-and-release-chart.yaml@v2.0.1-bulk-charts
+    uses: SwanseaUniversityMedical/workflows/.github/workflows/bulk-pr-and-release-chart.yaml@renovate/bulk-pr-and-release-chart-2.x
     strategy:
       fail-fast: false
       matrix:

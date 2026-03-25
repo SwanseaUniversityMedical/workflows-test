@@ -2,7 +2,7 @@ name: AzureKeycloakTester Container
 
 on:
   pull_request:
-    # Only consider PRs that change files for this asset, including ci scripts.
+    # Only consider PRs that change files for this asset, including ci scripts..
     paths:
       - '.github/workflows/azurekeycloaktester-container.yaml'
       - 'containers/AzureKeycloakTester/**'
@@ -33,7 +33,7 @@ jobs:
   # Job name must be unique across repo to target
   # branch protection rules "required checks" properly!
   azurekeycloaktester-container:
-    uses: SwanseaUniversityMedical/workflows/.github/workflows/pr-and-release-container.yaml@v3.4.2-containers
+    uses: SwanseaUniversityMedical/workflows/.github/workflows/pr-and-release-container.yaml@renovate/pr-and-release-container-3.x
     with:
       job-name: azurekeycloaktester-container
       comment-pr: "true"

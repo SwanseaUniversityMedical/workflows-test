@@ -2,7 +2,7 @@ name: Fizzbuzz Chart
 
 on:
   pull_request:
-    # Only consider PRs that change files for this asset, including ci scripts
+    # Only consider PRs that change files for this asset, including ci scripts.
     paths:
       - '.github/workflows/fizzbuzz-chart.yaml'
       - 'charts/fizzbuzz/**'
@@ -30,7 +30,7 @@ jobs:
   # Job name must be unique across repo to target
   # branch protection rules "required checks" properly!
   fizzbuzz-chart:
-    uses: SwanseaUniversityMedical/workflows/.github/workflows/pr-and-release-chart.yaml@v3.1.4-charts
+    uses: SwanseaUniversityMedical/workflows/.github/workflows/pr-and-release-chart.yaml@renovate/pr-and-release-chart-3.x
     with:
       job-name: fizzbuzz-chart
       comment-pr: "true"
