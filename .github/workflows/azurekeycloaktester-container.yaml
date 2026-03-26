@@ -33,7 +33,7 @@ jobs:
   # Job name must be unique across repo to target
   # branch protection rules "required checks" properly!
   azurekeycloaktester-container:
-    uses: SwanseaUniversityMedical/workflows/.github/workflows/pr-and-release-container.yaml@renovate/pr-and-release-repo-3.x
+    uses: SwanseaUniversityMedical/workflows/.github/workflows/pr-and-release-container.yaml@fix/cosign-args
     with:
       job-name: azurekeycloaktester-container
       comment-pr: "true"
