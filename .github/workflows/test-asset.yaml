@@ -33,7 +33,7 @@ jobs:
       group: heavy
 
     steps:
-      - uses: SwanseaUniversityMedical/workflows/.github/actions/asset@feat/tag-based-release-pipeline
+      - uses: SwanseaUniversityMedical/workflows/.github/actions/asset@feat/docker-build-target
         with:
           name: test-asset
           comment-release: true

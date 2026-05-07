@@ -16,4 +16,4 @@ concurrency:
 
 jobs:
   pr-title-commitlint:
-    uses: SwanseaUniversityMedical/workflows/.github/workflows/pr-title-commitlint.yaml@renovate/pr-and-release-repo-3.x
+    uses: SwanseaUniversityMedical/workflows/.github/workflows/pr-title-commitlint.yaml@feat/docker-build-target
