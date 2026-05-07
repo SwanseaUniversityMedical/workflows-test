@@ -14,7 +14,7 @@ concurrency:
 
 jobs:
   controller-ruff:
-    uses: SwanseaUniversityMedical/workflows/.github/workflows/ruff.yaml@feat/ruff-ci
+    uses: SwanseaUniversityMedical/workflows/.github/workflows/ruff.yaml@feat/docker-build-target
     with:
       config-file: 'ruff.toml'
       source-path: 'containers/controller/src'
