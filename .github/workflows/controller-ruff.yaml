@@ -14,7 +14,7 @@ concurrency:
 
 jobs:
   controller-ruff:
-    uses: SwanseaUniversityMedical/workflows/.github/workflows/ruff.yaml@fix/cosign-tlog
+    uses: SwanseaUniversityMedical/workflows/.github/workflows/ruff.yaml@chore/bump-pins
     with:
       config-file: 'ruff.toml'
       source-path: 'containers/controller/src'

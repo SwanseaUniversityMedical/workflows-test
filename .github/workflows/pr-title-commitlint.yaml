@@ -16,4 +16,4 @@ concurrency:
 
 jobs:
   pr-title-commitlint:
-    uses: SwanseaUniversityMedical/workflows/.github/workflows/pr-title-commitlint.yaml@fix/cosign-tlog
+    uses: SwanseaUniversityMedical/workflows/.github/workflows/pr-title-commitlint.yaml@chore/bump-pins
