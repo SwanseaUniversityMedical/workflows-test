@@ -33,7 +33,7 @@ jobs:
       group: heavy
 
     steps:
-      - uses: SwanseaUniversityMedical/workflows/.github/actions/asset@feat/cosign-tlog
+      - uses: SwanseaUniversityMedical/workflows/.github/actions/asset@fix/cosign-tlog
         with:
           name: test-asset
           comment-release: true
