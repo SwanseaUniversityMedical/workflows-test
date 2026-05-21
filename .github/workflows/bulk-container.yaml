@@ -51,6 +51,7 @@ jobs:
             registry-repo: ${{ vars.HARBOR_PROJECT }}/bulk-controller
             build-file: containers/controller/Dockerfile
             build-context: containers/controller
+            build-target: controller
 
           - job-name: bulk-trino-container
             registry-repo: ${{ vars.HARBOR_PROJECT }}/bulk-trino
@@ -68,6 +69,7 @@ jobs:
       cosign-public-key: ${{ vars.COSIGN_PUBLIC_KEY }}
       build-file: ${{ matrix.build-file }}
       build-context: ${{ matrix.build-context }}
+      build-target: ${{ matrix.build-target }}
     secrets:
       cosign-private-key: ${{ secrets.COSIGN_PRIVATE_KEY }}
       cosign-password: ${{ secrets.COSIGN_PASSWORD }}

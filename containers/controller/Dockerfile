@@ -1,4 +1,4 @@
-FROM alpine:3.20
+FROM alpine:3.20 AS controller
 
 COPY src/requirements.txt /opt/requirements.txt
 
@@ -16,3 +16,5 @@ COPY src/ /opt/
 ENTRYPOINT ["python3", "/opt/controller.py"]
 #CMD ["--help"]
 # test
+
+FROM scratch AS foobar
