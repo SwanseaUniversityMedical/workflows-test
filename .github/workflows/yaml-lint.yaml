@@ -30,6 +30,6 @@ concurrency:
 jobs:
   yamllint:
     uses: SwanseaUniversityMedical/workflows/.github/workflows/yamllint.yaml@feat/yaml-linter
-#    with:
-#      base-dir: .
+    with:
+      config-file: .github/.yamllint.yaml
 

@@ -1,0 +1,15 @@
+extends: default
+
+rules:
+  document-start: disable
+  truthy: disable
+  line-length: disable
+  comments:
+    require-starting-space: false
+    min-spaces-from-content: 0
+  brackets:
+    min-spaces-inside: 0
+    max-spaces-inside: 10
+  new-line-at-end-of-file: disable
+  empty-lines: disable
+  trailing-spaces: disable
