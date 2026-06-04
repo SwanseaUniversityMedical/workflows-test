@@ -1,0 +1,11 @@
+extends: default
+
+rules:
+  document-start: disable
+  truthy: disable
+  line-length: disable
+  comments:
+    require-starting-space: false
+  brackets:
+    min-spaces-inside: 0
+    max-spaces-inside: 10
