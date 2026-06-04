@@ -12,3 +12,4 @@ rules:
     max-spaces-inside: 10
   new-line-at-end-of-file: disable
   empty-lines: disable
+  trailing-spaces: disable
