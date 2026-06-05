@@ -29,7 +29,7 @@ concurrency:
 
 jobs:
   yamllint:
-    uses: SwanseaUniversityMedical/workflows/.github/workflows/yamllint.yaml@v1.0.0-yaml-linting
+    uses: SwanseaUniversityMedical/workflows/.github/workflows/yamllint.yaml@v1.1.2-yaml-linting
     with:
       config-file: .github/.yamllint.yaml
 
