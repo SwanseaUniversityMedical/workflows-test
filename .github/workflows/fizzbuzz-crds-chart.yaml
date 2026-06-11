@@ -30,7 +30,7 @@ jobs:
   # Job name must be unique across repo to target
   # branch protection rules "required checks" properly!
   fizzbuzz-crds-chart:
-    uses: SwanseaUniversityMedical/workflows/.github/workflows/pr-and-release-chart.yaml@feat/docker-build-target
+    uses: SwanseaUniversityMedical/workflows/.github/workflows/pr-and-release-chart.yaml@chore/bump-pins
     with:
       job-name: fizzbuzz-crds-chart
       comment-pr: "true"
@@ -40,12 +40,12 @@ jobs:
       registry-project: ${{ vars.HARBOR_PROJECT }}
       registry-repo: fizzbuzz-crds
       release-tag-format: 'v${version}-fizzbuzz-crds-chart'
-      cosign-public-key: ${{ vars.COSIGN_PUBLIC_KEY }}
+      notation-cert: ${{ vars.NOTATION_CERT }}
       chart: charts/fizzbuzz-crds
       test-command: |
         helm template $CHART --debug
 
     secrets:
-      cosign-private-key: ${{ secrets.COSIGN_PRIVATE_KEY }}
-      cosign-password: ${{ secrets.COSIGN_PASSWORD }}
+      notation-key: ${{ secrets.NOTATION_KEY }}
+      
       registry-token: ${{ secrets.HARBOR_TOKEN }}

@@ -2,7 +2,7 @@ name: Bulk Container
 
 on:
   pull_request:
-    # Only consider PRs that change files for this asset, including ci scripts.
+    # Only consider PRs that change files for this asset, including ci scripts.......
     paths:
       - '.github/workflows/bulk-container.yaml'
       - 'containers/controller/**'
@@ -35,14 +35,14 @@ jobs:
   # Job name must be unique across repo to target
   # branch protection rules "required checks" properly!
   repo:
-    uses: SwanseaUniversityMedical/workflows/.github/workflows/pr-and-release-repo.yaml@feat/docker-build-target
+    uses: SwanseaUniversityMedical/workflows/.github/workflows/pr-and-release-repo.yaml@chore/bump-pins
     with:
       job-name: bulk-container-matrix
       release-tag-format: 'v${version}-bulk-container'
 
   bulk-container:
     needs: repo
-    uses: SwanseaUniversityMedical/workflows/.github/workflows/bulk-pr-and-release-container.yaml@feat/docker-build-target
+    uses: SwanseaUniversityMedical/workflows/.github/workflows/bulk-pr-and-release-container.yaml@chore/bump-pins
     strategy:
       fail-fast: false
       matrix:
@@ -66,11 +66,11 @@ jobs:
       registry-user: ${{ vars.HARBOR_USER }}
       registry-repo: ${{ matrix.registry-repo }}
       release-info: ${{ needs.repo.outputs.release-info }}
-      cosign-public-key: ${{ vars.COSIGN_PUBLIC_KEY }}
+      notation-cert: ${{ vars.NOTATION_CERT }}
       build-file: ${{ matrix.build-file }}
       build-context: ${{ matrix.build-context }}
       build-target: ${{ matrix.build-target }}
     secrets:
-      cosign-private-key: ${{ secrets.COSIGN_PRIVATE_KEY }}
-      cosign-password: ${{ secrets.COSIGN_PASSWORD }}
+      notation-key: ${{ secrets.NOTATION_KEY }}
+      
       registry-token: ${{ secrets.HARBOR_TOKEN }}

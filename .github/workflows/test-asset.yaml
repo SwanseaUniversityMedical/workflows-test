@@ -33,7 +33,7 @@ jobs:
       group: heavy
 
     steps:
-      - uses: SwanseaUniversityMedical/workflows/.github/actions/asset@feat/docker-build-target
+      - uses: SwanseaUniversityMedical/workflows/.github/actions/asset@chore/bump-pins
         with:
           name: test-asset
           comment-release: true

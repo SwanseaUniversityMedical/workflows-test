@@ -2,7 +2,7 @@ name: Trino Container
 
 on:
   pull_request:
-    # Only consider PRs that change files for this asset, including ci scripts.
+    # Only consider PRs that change files for this asset, including ci scripts..
     paths:
       - '.github/workflows/trino-container.yaml'
       - 'containers/trino/**'
@@ -30,7 +30,7 @@ jobs:
   # Job name must be unique across repo to target
   # branch protection rules "required checks" properly!
   trino-container:
-    uses: SwanseaUniversityMedical/workflows/.github/workflows/pr-and-release-container.yaml@feat/docker-build-target
+    uses: SwanseaUniversityMedical/workflows/.github/workflows/pr-and-release-container.yaml@chore/bump-pins
     with:
       job-name: trino-container
       comment-pr: "true"
@@ -41,10 +41,10 @@ jobs:
       release-tag-format: 'v${version}-trino-container'
       registry-extra-tag-command: >-
         cat containers/trino/Dockerfile | grep -m 1 "ARG BASE_VERSION=" | cut -d "=" -f 2
-      cosign-public-key: ${{ vars.COSIGN_PUBLIC_KEY }}
+      notation-cert: ${{ vars.NOTATION_CERT }}
       build-file: containers/trino/Dockerfile
       build-context: containers/trino
     secrets:
-      cosign-private-key: ${{ secrets.COSIGN_PRIVATE_KEY }}
-      cosign-password: ${{ secrets.COSIGN_PASSWORD }}
+      notation-key: ${{ secrets.NOTATION_KEY }}
+      
       registry-token: ${{ secrets.HARBOR_TOKEN }}
