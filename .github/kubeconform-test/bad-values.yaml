@@ -1,0 +1,22 @@
+extraManifests:
+  # replicas is a string where the schema wants an integer, and imagePullPolicy
+  # is misspelt. helm template accepts both, kubeconform -strict rejects them.
+  - |
+    apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      name: bad
+    spec:
+      replicas: "1"
+      selector:
+        matchLabels:
+          app: bad
+      template:
+        metadata:
+          labels:
+            app: bad
+        spec:
+          containers:
+            - name: c
+              image: nginx:1.27
+              imagePullPolicey: IfNotPresent
