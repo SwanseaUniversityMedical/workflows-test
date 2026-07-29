@@ -35,32 +35,65 @@ jobs:
         with:
           version: 'v3.15.1'
 
-      # Renders nothing at all without --include-crds, so a pass here with a
-      # non-zero resource count proves the flag is doing its job.
+      # Everything else is meaningless if the runner cannot fetch schemas,
+      # because -ignore-missing-schemas turns that into a silent pass. Probe the
+      # exact URLs kubeconform builds before drawing any conclusions.
+      #
+      # Expected from outside the runner: deployment 200, every
+      # customresourcedefinition variant 404. The CRD kind genuinely has no
+      # schema in the default registry.
+      - name: probe schema egress
+        shell: bash
+        run: |
+          set -uo pipefail
+
+          probe() {
+            local label="$1" url="$2"
+            local code
+            code="$(curl -s -o /dev/null -w '%{http_code}' --max-time 20 "$url" || echo 'curl-failed')"
+            printf '%-26s %s  %s\n' "$label" "$code" "$url"
+          }
+
+          echo "proxy: HTTP_PROXY='${HTTP_PROXY:-}' HTTPS_PROXY='${HTTPS_PROXY:-}' NO_PROXY='${NO_PROXY:-}'"
+          echo
+
+          BASE='https://raw.githubusercontent.com/yannh/kubernetes-json-schema/master'
+          probe 'deployment (strict)' "${BASE}/master-standalone-strict/deployment-apps-v1.json"
+          probe 'crd (strict)' "${BASE}/master-standalone-strict/customresourcedefinition-apiextensions-v1.json"
+          probe 'crd (non-strict)' "${BASE}/master-standalone/customresourcedefinition-apiextensions-v1.json"
+          probe 'crds-catalog root' 'https://raw.githubusercontent.com/datreeio/CRDs-catalog/main/README.md'
+
+      # This chart contains ONLY a crds/ directory, so it renders nothing at all
+      # unless --include-crds is applied. Finding a resource is the assertion;
+      # the CRD being Skipped is expected, since CustomResourceDefinition has no
+      # schema in the default registry.
       - name: crds chart
         id: crds
         uses: SwanseaUniversityMedical/workflows/.github/actions/kubeconform@feat/kubeconform
         with:
           chart: charts/fizzbuzz-crds
 
-      - name: assert crds chart validated a resource
+      - name: assert include-crds rendered the crd
         shell: bash
         run: |
           set -euo pipefail
           echo "result=$RESULT"
           echo "summary=$SUMMARY"
+
           if [[ "$RESULT" != 'success' ]]; then
-            echo "::error::expected the crds chart to validate cleanly"
+            echo "::error::expected the crds chart to come back clean"
             exit 1
           fi
-          if [[ "$SUMMARY" != *'Valid: 1'* ]]; then
-            echo "::error::expected exactly 1 valid resource, --include-crds may not be applied"
+          if [[ "$SUMMARY" != *'1 resource found'* ]]; then
+            echo "::error::expected 1 rendered resource, --include-crds is not being applied"
             exit 1
           fi
         env:
           RESULT: ${{ steps.crds.outputs.result }}
           SUMMARY: ${{ steps.crds.outputs.summary-line }}
 
+      # A Deployment does have a schema, so this is the step that proves schema
+      # resolution actually works rather than silently skipping everything.
       - name: valid manifests
         id: good
         uses: SwanseaUniversityMedical/workflows/.github/actions/kubeconform@feat/kubeconform
@@ -68,6 +101,18 @@ jobs:
           chart: charts/fizzbuzz
           enforce: "true"
           helm-template-args: '--values .github/kubeconform-test/good-values.yaml'
+
+      - name: assert schemas actually resolved
+        shell: bash
+        run: |
+          set -euo pipefail
+          echo "summary=$SUMMARY"
+          if [[ "$SUMMARY" != *'Valid: 1'* ]]; then
+            echo "::error::the Deployment was not validated against a schema. Check the probe step: if deployment-apps-v1.json is not 200 from this runner, schema egress is blocked and -ignore-missing-schemas is masking it as a pass."
+            exit 1
+          fi
+        env:
+          SUMMARY: ${{ steps.good.outputs.summary-line }}
 
       # enforce defaults to false, so problems must be reported without failing.
       - name: invalid manifests are reported but not enforced
@@ -77,16 +122,18 @@ jobs:
           chart: charts/fizzbuzz
           helm-template-args: '--values .github/kubeconform-test/bad-values.yaml'
 
-      - name: assert warn mode did not fail the build
+      - name: assert warn mode reported issues without failing
         shell: bash
         run: |
           set -euo pipefail
+          echo "summary=$SUMMARY"
           if [[ "$RESULT" != 'issues' ]]; then
-            echo "::error::expected result 'issues', got '$RESULT'"
+            echo "::error::expected result 'issues', got '$RESULT'. If the summary shows Skipped rather than Invalid then schemas are not resolving."
             exit 1
           fi
         env:
           RESULT: ${{ steps.warn.outputs.result }}
+          SUMMARY: ${{ steps.warn.outputs.summary-line }}
 
       - name: invalid manifests are blocking when enforced
         id: enforced
