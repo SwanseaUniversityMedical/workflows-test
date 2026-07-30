@@ -1,6 +1,0 @@
-apiVersion: v2
-appVersion: 1.0.0
-description: Ships a CRD and an invalid custom resource of it, for kubeconform tests.
-name: kubeconform-crd-invalid
-type: application
-version: 0.0.0

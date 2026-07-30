@@ -11,7 +11,6 @@ on:
       - '.github/workflows/kubeconform-smoke.yaml'
       - '.github/kubeconform-test/**'
       - 'charts/kubeconform-crd-valid/**'
-      - 'charts/kubeconform-crd-invalid/**'
   push:
     branches:
       - 'test/kubeconform'
@@ -158,81 +157,32 @@ jobs:
         env:
           OUTCOME: ${{ steps.enforced.outcome }}
 
-      # In-house custom resources. There is no public catalog entry for
-      # fizzbuzz.ukserp.ac.uk, so these only validate because the action
-      # generates schemas from the CRD the chart itself ships.
-      - name: in-house custom resource is valid
-        id: crd-good
+      # Documents a known gap rather than a working feature. There is no public
+      # catalog entry for fizzbuzz.ukserp.ac.uk and the CustomResourceDefinition
+      # kind has no schema in the Kubernetes registry, so both documents in this
+      # chart are reported as unvalidated. Generating schemas from a chart's own
+      # CRDs was attempted and removed - see the action's history. If in-house
+      # CRD support is added later this assertion flips and will say so.
+      - name: in-house custom resources are reported as unvalidated
+        id: crd
         uses: SwanseaUniversityMedical/workflows/.github/actions/kubeconform@feat/kubeconform
         with:
           chart: charts/kubeconform-crd-valid
-          enforce: "true"
 
-      - name: assert the custom resource was validated, not skipped
+      - name: assert the coverage gap is reported, not hidden
         shell: bash
         run: |
           set -euo pipefail
           echo "summary=$SUMMARY"
-          echo "skipped-count=$SKIPPED"
           echo "skipped-kinds=$KINDS"
 
-          # This chart renders exactly two documents: the CRD and one custom
-          # resource. The CRD has no schema in the Kubernetes registry so it is
-          # always skipped, which means a correct run is Valid: 1, Skipped: 1
-          # with Fizzbuzz validated. Counts alone cannot tell that apart from
-          # the inverse, so assert on the kind that was skipped.
-          if [[ "$KINDS" == *'Fizzbuzz'* ]]; then
-            echo "::error::the Fizzbuzz custom resource was skipped, so the schema generated from this chart's CRD is not being matched. Check the 'schema locations' group in the validate step."
-            exit 1
-          fi
-          if [[ "$KINDS" != *'CustomResourceDefinition'* ]]; then
-            echo "::error::expected the CustomResourceDefinition itself to be the skipped resource, got '$KINDS'"
-            exit 1
-          fi
-          if [[ "$SUMMARY" != *'Valid: 1'* ]]; then
-            echo "::error::expected the custom resource to be validated against a schema generated from the chart's CRD"
-            exit 1
-          fi
-        env:
-          SUMMARY: ${{ steps.crd-good.outputs.summary-line }}
-          SKIPPED: ${{ steps.crd-good.outputs.skipped-count }}
-          KINDS: ${{ steps.crd-good.outputs.skipped-kinds }}
-
-      - name: in-house custom resource with a bad field
-        id: crd-bad
-        continue-on-error: true
-        uses: SwanseaUniversityMedical/workflows/.github/actions/kubeconform@feat/kubeconform
-        with:
-          chart: charts/kubeconform-crd-invalid
-          enforce: "true"
-
-      - name: assert the bad custom resource was caught
-        shell: bash
-        run: |
-          set -euo pipefail
-          echo "outcome=$OUTCOME"
-          echo "summary=$SUMMARY"
-          echo "skipped-kinds=$KINDS"
-
-          if [[ "$OUTCOME" != 'failure' ]]; then
-            # Three different faults land here and they need different fixes, so
-            # read the counts rather than inferring from the skipped kinds alone.
-            found="$(sed -n 's/^Summary: \([0-9][0-9]*\) resource.*/\1/p' <<< "$SUMMARY")"
-            valid="$(sed -n 's/.*Valid: \([0-9][0-9]*\).*/\1/p' <<< "$SUMMARY")"
-
-            if [[ "$KINDS" == *'Fizzbuzz'* ]]; then
-              echo "::error::the Fizzbuzz custom resource was SKIPPED. The generated schema was not matched - compare its filename against the -schema-location template in the 'schema locations' group."
-            elif [[ "${found:-0}" -lt 2 ]]; then
-              echo "::error::kubeconform only saw ${found:-0} resource(s), but the chart renders a CRD and a custom resource. The custom resource is not reaching kubeconform at all - it is being parsed as empty, so no schema is ever consulted."
-            elif [[ "${valid:-0}" -ge 1 ]]; then
-              echo "::error::the Fizzbuzz custom resource was validated but spec.n='fifteen' was accepted despite the CRD declaring an integer. The schema is being found but not applied."
-            else
-              echo "::error::unexpected: enforce=true did not fail. summary='$SUMMARY'"
+          for kind in CustomResourceDefinition Fizzbuzz; do
+            if [[ "$KINDS" != *"$kind"* ]]; then
+              echo "::error::expected $kind to be reported as unvalidated, got '$KINDS'. If custom resources are now being validated then in-house CRD support works and this assertion should be inverted."
+              exit 1
             fi
-            exit 1
-          fi
-          echo "in-house custom resource validation is working"
+          done
+          echo "coverage gap is reported honestly"
         env:
-          OUTCOME: ${{ steps.crd-bad.outcome }}
-          SUMMARY: ${{ steps.crd-bad.outputs.summary-line }}
-          KINDS: ${{ steps.crd-bad.outputs.skipped-kinds }}
+          SUMMARY: ${{ steps.crd.outputs.summary-line }}
+          KINDS: ${{ steps.crd.outputs.skipped-kinds }}
