@@ -215,10 +215,19 @@ jobs:
           echo "skipped-kinds=$KINDS"
 
           if [[ "$OUTCOME" != 'failure' ]]; then
+            # Three different faults land here and they need different fixes, so
+            # read the counts rather than inferring from the skipped kinds alone.
+            found="$(sed -n 's/^Summary: \([0-9][0-9]*\) resource.*/\1/p' <<< "$SUMMARY")"
+            valid="$(sed -n 's/.*Valid: \([0-9][0-9]*\).*/\1/p' <<< "$SUMMARY")"
+
             if [[ "$KINDS" == *'Fizzbuzz'* ]]; then
-              echo "::error::the Fizzbuzz custom resource was SKIPPED, not validated. The schema generated from this chart's CRD was not matched - compare the generated filename against the -schema-location template in the 'schema locations' group of the validate step."
+              echo "::error::the Fizzbuzz custom resource was SKIPPED. The generated schema was not matched - compare its filename against the -schema-location template in the 'schema locations' group."
+            elif [[ "${found:-0}" -lt 2 ]]; then
+              echo "::error::kubeconform only saw ${found:-0} resource(s), but the chart renders a CRD and a custom resource. The custom resource is not reaching kubeconform at all - it is being parsed as empty, so no schema is ever consulted."
+            elif [[ "${valid:-0}" -ge 1 ]]; then
+              echo "::error::the Fizzbuzz custom resource was validated but spec.n='fifteen' was accepted despite the CRD declaring an integer. The schema is being found but not applied."
             else
-              echo "::error::the Fizzbuzz custom resource was validated but spec.n='fifteen' was accepted despite the CRD declaring an integer. The generated schema is being found but is not constraining the type."
+              echo "::error::unexpected: enforce=true did not fail. summary='$SUMMARY'"
             fi
             exit 1
           fi
