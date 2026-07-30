@@ -10,6 +10,8 @@ on:
     paths:
       - '.github/workflows/kubeconform-smoke.yaml'
       - '.github/kubeconform-test/**'
+      - 'charts/kubeconform-crd-valid/**'
+      - 'charts/kubeconform-crd-invalid/**'
   push:
     branches:
       - 'test/kubeconform'
@@ -155,3 +157,52 @@ jobs:
           echo "enforced mode failed as expected"
         env:
           OUTCOME: ${{ steps.enforced.outcome }}
+
+      # In-house custom resources. There is no public catalog entry for
+      # fizzbuzz.ukserp.ac.uk, so these only validate because the action
+      # generates schemas from the CRD the chart itself ships.
+      - name: in-house custom resource is valid
+        id: crd-good
+        uses: SwanseaUniversityMedical/workflows/.github/actions/kubeconform@feat/kubeconform
+        with:
+          chart: charts/kubeconform-crd-valid
+          enforce: "true"
+
+      - name: assert the custom resource was validated, not skipped
+        shell: bash
+        run: |
+          set -euo pipefail
+          echo "summary=$SUMMARY"
+          # The CRD itself is always skipped, so expect exactly 1 skipped and
+          # the custom resource counted as valid.
+          if [[ "$SKIPPED" != '1' ]]; then
+            echo "::error::expected exactly 1 skipped resource (the CRD), got '$SKIPPED'. If it is 2 then the custom resource was not matched to a generated schema."
+            exit 1
+          fi
+          if [[ "$SUMMARY" != *'Valid: 1'* ]]; then
+            echo "::error::expected the custom resource to be validated against a schema generated from the chart's CRD"
+            exit 1
+          fi
+        env:
+          SUMMARY: ${{ steps.crd-good.outputs.summary-line }}
+          SKIPPED: ${{ steps.crd-good.outputs.skipped-count }}
+
+      - name: in-house custom resource with a bad field
+        id: crd-bad
+        continue-on-error: true
+        uses: SwanseaUniversityMedical/workflows/.github/actions/kubeconform@feat/kubeconform
+        with:
+          chart: charts/kubeconform-crd-invalid
+          enforce: "true"
+
+      - name: assert the bad custom resource was caught
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ "$OUTCOME" != 'failure' ]]; then
+            echo "::error::spec.n is a string but the CRD declares an integer, and this was not caught. Schemas generated from the chart's CRDs are not being applied."
+            exit 1
+          fi
+          echo "in-house custom resource validation is working"
+        env:
+          OUTCOME: ${{ steps.crd-bad.outcome }}
