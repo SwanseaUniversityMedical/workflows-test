@@ -1,0 +1,6 @@
+apiVersion: fizzbuzz.ukserp.ac.uk/v1
+kind: Fizzbuzz
+metadata:
+  name: valid
+spec:
+  n: 15

@@ -1,0 +1,7 @@
+apiVersion: fizzbuzz.ukserp.ac.uk/v1
+kind: Fizzbuzz
+metadata:
+  name: invalid
+spec:
+  # The CRD declares n as an integer. helm renders this happily.
+  n: "fifteen"
