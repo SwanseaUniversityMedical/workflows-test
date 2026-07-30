@@ -173,10 +173,20 @@ jobs:
         run: |
           set -euo pipefail
           echo "summary=$SUMMARY"
-          # The CRD itself is always skipped, so expect exactly 1 skipped and
-          # the custom resource counted as valid.
-          if [[ "$SKIPPED" != '1' ]]; then
-            echo "::error::expected exactly 1 skipped resource (the CRD), got '$SKIPPED'. If it is 2 then the custom resource was not matched to a generated schema."
+          echo "skipped-count=$SKIPPED"
+          echo "skipped-kinds=$KINDS"
+
+          # This chart renders exactly two documents: the CRD and one custom
+          # resource. The CRD has no schema in the Kubernetes registry so it is
+          # always skipped, which means a correct run is Valid: 1, Skipped: 1
+          # with Fizzbuzz validated. Counts alone cannot tell that apart from
+          # the inverse, so assert on the kind that was skipped.
+          if [[ "$KINDS" == *'Fizzbuzz'* ]]; then
+            echo "::error::the Fizzbuzz custom resource was skipped, so the schema generated from this chart's CRD is not being matched. Check the 'schema locations' group in the validate step."
+            exit 1
+          fi
+          if [[ "$KINDS" != *'CustomResourceDefinition'* ]]; then
+            echo "::error::expected the CustomResourceDefinition itself to be the skipped resource, got '$KINDS'"
             exit 1
           fi
           if [[ "$SUMMARY" != *'Valid: 1'* ]]; then
@@ -186,6 +196,7 @@ jobs:
         env:
           SUMMARY: ${{ steps.crd-good.outputs.summary-line }}
           SKIPPED: ${{ steps.crd-good.outputs.skipped-count }}
+          KINDS: ${{ steps.crd-good.outputs.skipped-kinds }}
 
       - name: in-house custom resource with a bad field
         id: crd-bad
@@ -199,10 +210,20 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          echo "outcome=$OUTCOME"
+          echo "summary=$SUMMARY"
+          echo "skipped-kinds=$KINDS"
+
           if [[ "$OUTCOME" != 'failure' ]]; then
-            echo "::error::spec.n is a string but the CRD declares an integer, and this was not caught. Schemas generated from the chart's CRDs are not being applied."
+            if [[ "$KINDS" == *'Fizzbuzz'* ]]; then
+              echo "::error::the Fizzbuzz custom resource was SKIPPED, not validated. The schema generated from this chart's CRD was not matched - compare the generated filename against the -schema-location template in the 'schema locations' group of the validate step."
+            else
+              echo "::error::the Fizzbuzz custom resource was validated but spec.n='fifteen' was accepted despite the CRD declaring an integer. The generated schema is being found but is not constraining the type."
+            fi
             exit 1
           fi
           echo "in-house custom resource validation is working"
         env:
           OUTCOME: ${{ steps.crd-bad.outcome }}
+          SUMMARY: ${{ steps.crd-bad.outputs.summary-line }}
+          KINDS: ${{ steps.crd-bad.outputs.skipped-kinds }}
