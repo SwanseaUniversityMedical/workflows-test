@@ -1,0 +1,20 @@
+extraManifests:
+  - |
+    apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      name: good
+    spec:
+      replicas: 1
+      selector:
+        matchLabels:
+          app: good
+      template:
+        metadata:
+          labels:
+            app: good
+        spec:
+          containers:
+            - name: c
+              image: nginx:1.27
+              imagePullPolicy: IfNotPresent
