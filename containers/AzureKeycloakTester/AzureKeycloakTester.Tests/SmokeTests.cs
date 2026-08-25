@@ -1,3 +1,5 @@
+using Xunit;
+
 namespace AzureKeycloakTester.Tests;
 
 public class SmokeTests
