@@ -1,8 +1,10 @@
 name: vcluster-test
-on: workflow_dispatch
+on:
+  workflow_dispatch:
+  pull_request:
 
 jobs:
-  smoke:
+  test:
     runs-on: [self-hosted, linux, vcluster]
     steps:
       - run: hostname && uname -a
