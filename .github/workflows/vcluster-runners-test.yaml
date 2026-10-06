@@ -1,0 +1,10 @@
+name: vcluster-test
+on: workflow_dispatch
+
+jobs:
+  smoke:
+    runs-on: [self-hosted, linux, vcluster]
+    steps:
+      - run: hostname && uname -a
+      - run: docker version
+      - run: docker run --rm hello-world
