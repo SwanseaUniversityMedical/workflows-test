@@ -24,4 +24,11 @@
     <PackageReference Include="Serilog.Sinks.Seq" Version="6.0.0" />
   </ItemGroup>
 
+  <!-- The test project is nested under this app dir; keep its sources out of the Web SDK's default globs -->
+  <ItemGroup>
+    <Compile Remove="AzureKeycloakTester.Tests/**/*.cs" />
+    <Content Remove="AzureKeycloakTester.Tests/**/*" />
+    <None Remove="AzureKeycloakTester.Tests/**/*" />
+  </ItemGroup>
+
 </Project>

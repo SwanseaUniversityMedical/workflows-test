@@ -33,7 +33,7 @@ jobs:
   # Job name must be unique across repo to target
   # branch protection rules "required checks" properly!
   azurekeycloaktester-container:
-    uses: SwanseaUniversityMedical/workflows/.github/workflows/pr-and-release-container.yaml@chore/semantic-release-bump
+    uses: SwanseaUniversityMedical/workflows/.github/workflows/pr-and-release-container.yaml@v5.0.0-containers
     with:
       job-name: azurekeycloaktester-container-short-tag
       comment-pr: "true"
@@ -42,12 +42,11 @@ jobs:
       registry-user: ${{ vars.HARBOR_USER }}
       registry-repo: ${{ vars.HARBOR_PROJECT }}/azurekeycloaktester-short
       release-tag-format: 'v${version}-azurekeycloaktester-container-longer'
-      cosign-public-key: ${{ vars.COSIGN_PUBLIC_KEY }}
+      notation-cert: ${{ vars.NOTATION_CERT }}
       build-file: containers/AzureKeycloakTester/Dockerfile
       build-context: containers
     secrets:
-      cosign-private-key: ${{ secrets.COSIGN_PRIVATE_KEY }}
-      cosign-password: ${{ secrets.COSIGN_PASSWORD }}
+      notation-key: ${{ secrets.NOTATION_KEY }}
       registry-token: ${{ secrets.HARBOR_TOKEN }}
 
   

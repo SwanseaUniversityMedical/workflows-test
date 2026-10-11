@@ -26,11 +26,12 @@ concurrency:
 
 jobs:
   azurekeycloaktester-sonar:
-    uses: SwanseaUniversityMedical/workflows/.github/workflows/sonar-dotnet-8.yaml@feat/docker-build-target
+    uses: SwanseaUniversityMedical/workflows/.github/workflows/sonar-dotnet-8.yaml@feat/add-sonar-dotnet-test-support
     with:
       project-name: "workflows-test-azurekeycloaktester"
       project-file: "AzureKeycloakTester.csproj"
       project-context: "containers/AzureKeycloakTester"
+      test-project-file: "AzureKeycloakTester.Tests/AzureKeycloakTester.Tests.csproj"
       sonar-url: ${{ vars.SONAR_DEV_URL }}
     secrets:
       sonar-token: ${{ secrets.SONAR_DEV_TOKEN }}
