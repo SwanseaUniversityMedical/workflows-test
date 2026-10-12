@@ -28,6 +28,14 @@ jobs:
     with:
       job-name: keycloakify-theme
       working-directory: keycloakify-theme
+      registry: ${{ vars.HARBOR_REGISTRY }}
+      registry-user: ${{ vars.HARBOR_USER }}
+      registry-repo: ${{ vars.HARBOR_PROJECT }}/keycloakify-theme
+      notation-cert: ${{ vars.NOTATION_CERT }}
       comment-pr: "true"
       comment-release: "true"
       release-tag-format: 'v${version}-keycloakify-theme'
+
+    secrets:
+      notation-key: ${{ secrets.NOTATION_KEY }}
+      registry-token: ${{ secrets.HARBOR_TOKEN }}
