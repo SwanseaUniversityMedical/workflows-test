@@ -1,0 +1,33 @@
+name: Keycloakify Theme
+
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/keycloakify-theme.yaml'
+      - 'keycloakify-theme/**'
+  push:
+    branches:
+      - 'main'
+    paths:
+      - '.github/workflows/keycloakify-theme.yaml'
+      - 'keycloakify-theme/**'
+
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+  actions: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  keycloakify-theme:
+    uses: SwanseaUniversityMedical/workflows/.github/workflows/pr-and-release-keycloakify.yaml@test/keycloakify
+    with:
+      job-name: keycloakify-theme
+      working-directory: keycloakify-theme
+      comment-pr: "true"
+      comment-release: "true"
+      release-tag-format: 'v${version}-keycloakify-theme'
