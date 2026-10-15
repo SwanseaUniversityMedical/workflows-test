@@ -24,7 +24,7 @@ concurrency:
 
 jobs:
   keycloakify-theme:
-    uses: SwanseaUniversityMedical/workflows/.github/workflows/pr-and-release-keycloakify.yaml@test/keycloakify
+    uses: SwanseaUniversityMedical/workflows/.github/workflows/pr-and-release-keycloakify.yaml@v1.0.0-pr-and-release-keycloakify-workflow
     with:
       job-name: keycloakify-theme
       working-directory: keycloakify-theme
