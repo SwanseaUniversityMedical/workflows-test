@@ -1,0 +1,23 @@
+name: Coverage Test 7
+
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/coverage-test-7.yaml'
+      - 'containers/coverage-test-7/**'
+  workflow_dispatch:
+
+jobs:
+  coverage-test-7:
+    runs-on:
+      labels: [self-hosted, linux, x64]
+      group: sonar
+    steps:
+      - uses: SwanseaUniversityMedical/workflows/.github/actions/sonar-dotnet-7@v3.1.0-sonar-dotnet-7-action
+        with:
+          project-name: "workflows-test-coverage-test-7"
+          project-file: "CoverageTest7.csproj"
+          project-context: "containers/coverage-test-7"
+          sonar-url: ${{ vars.SONAR_DEV_URL }}
+          sonar-token: ${{ secrets.SONAR_DEV_TOKEN }}
+          coverage-report-path: "containers/coverage-test-7/coverage.xml"
