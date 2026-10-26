@@ -20,4 +20,4 @@ jobs:
           project-context: "containers/coverage-test-8"
           sonar-url: ${{ vars.SONAR_DEV_URL }}
           sonar-token: ${{ secrets.SONAR_DEV_TOKEN }}
-          coverage-report-path: "containers/coverage-test-8/coverage.xml"
+          coverage-report-path: "containers/coverage-test-8/sonar-coverage.xml"
