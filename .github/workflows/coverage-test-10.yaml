@@ -5,6 +5,12 @@ on:
     paths:
       - '.github/workflows/coverage-test-10.yaml'
       - 'containers/coverage-test-10/**'
+  push:
+    branches:
+      - 'main'
+    paths:
+      - '.github/workflows/coverage-test-10.yaml'
+      - 'containers/coverage-test-10/**'
   workflow_dispatch:
 
 jobs:
