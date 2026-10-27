@@ -1,6 +1,6 @@
 <coverage version="1">
   <file path="/repo/containers/coverage-test-10/Calculator.cs">
     <lineToCover lineNumber="5" covered="true"/>
-    <lineToCover lineNumber="9" covered="false"/>
+    <lineToCover lineNumber="9" covered="true"/>
   </file>
 </coverage>
