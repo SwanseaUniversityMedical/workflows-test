@@ -1,0 +1,25 @@
+name: AzureKeycloakTester DotNet Test
+
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/azurekeycloaktester-dotnet-test.yaml'
+      - 'containers/AzureKeycloakTester/**'
+  push:
+    branches:
+      - 'main'
+    paths:
+      - '.github/workflows/azurekeycloaktester-dotnet-test.yaml'
+      - 'containers/AzureKeycloakTester/**'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  azurekeycloaktester-dotnet-test:
+    uses: SwanseaUniversityMedical/workflows/.github/workflows/dotnet-test.yaml@feat/add-dotnet-test-runner
+    with:
+      job-name: azurekeycloaktester-dotnet-test
+      project-file: "AzureKeycloakTester.Tests/AzureKeycloakTester.Tests.csproj"
+      project-context: "containers/AzureKeycloakTester"
